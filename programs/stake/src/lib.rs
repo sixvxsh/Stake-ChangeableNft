@@ -42,6 +42,11 @@ pub mod stake {
         let clock = Clock::get().unwrap();
 
 
+
+        // CPI WITH TOKEN PROGRAM FOR APPROVING
+
+        msg!("CPI WITH TOKEN PROGRAM FOR DELEGATE APPROVING..");
+
         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
         let cpi_approve_accounts = Approve {
             to: ctx.accounts.nft_token_account.to_account_info(),
@@ -51,10 +56,29 @@ pub mod stake {
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
 
         token::approve(cpi_approve_ctx , 1);
+        let authority_bump = *ctx.bumps.get("program_authority").unwrap();
+        invoke_signed(
+            &freeze_delegated_account(
+                ctx.accounts.metadata_program.key(), 
+                ctx.accounts.program_authority.key(),
+                ctx.accounts.nft_token_account.key(),
+                edition,
+                ctx.accounts.nft_mint.key()
+            ),
+            &[
+                ctx.accounts.program_authority.to_account_info(),
+                ctx.accounts.nft_mint.to_account_info(),
+                ctx.accounts.nft_token_account.to_account_info(),
+                //ctx.accounts.edition
+                ctx.accounts.metadata_program.to_account_info(),
+            ],
+            &[&[&[user]]]
+        );
 
 
 
-        
+
+
 
 
 
@@ -91,7 +115,7 @@ pub struct Stake<'info> {
 
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
-    // pub metadata_program: Program<'info, Metadata>,
+    pub metadata_program: Program<'info, Metadata>,
 
 }
 
