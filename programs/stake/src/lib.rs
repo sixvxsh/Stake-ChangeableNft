@@ -1,4 +1,19 @@
-use anchor_lang::prelude::*;
+use std::fs::Metadata;
+
+use anchor_lang::{prelude::*, solana_program::stake::state::StakeState};
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    token::{Approve, Mint, MintTo, Revoke, Token, TokenAccount},
+};
+
+use mpl_token_metadata::{
+    instruction::{freeze_delegated_account, thaw_delegated_account},
+    ID as MetadataTokenId,
+};
+
+use anchor_lang::solana_program::program::invoke_signed;
+use anchor_lang::Space;
+
 
 declare_id!("37HsMb2NSamepLG98j7MyYiB9E5tDBzsPYWVmoR32sJ2");
 
@@ -7,23 +22,56 @@ pub mod stake {
     use super::*;
 
     pub fn stake_swap(
-        _ctx: Context<Stake>, own_nft: String, wanted_nft: String) -> Result<()> {
+        _ctx: Context<Stake>, nft_name: String, wanted_nft: String) -> Result<()> {
+
+            require!()
+
         Ok(())
     }
 }
 
 #[derive(Accounts)]
-pub struct Stake { 
-    #[account(mut)]
+pub struct Stake<'info> { 
+    #[account(
+        init_if_needed,
+        payer = user,
+        space = std::mem::size_of::<Vault>() + 8,
+        seeds = [user.key().as_ref(), nft_token_account.key().as_ref()],
+        bump
+    )]
+    pub stake_vault: Account<'info, Vault>,
 
-    pub vault: Account<'info , Vault>
+    #[account(mut)]
+    pub user: Signer<'info>,
+    #[account(
+        mut,
+        associated_token::mint=nft_mint,
+        associated_token::authority=user
+    )]
+    pub nft_token_account: Account<'info, TokenAccount>,
+    pub nft_mint: Account<'info, Mint>,
+
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+    // pub metadata_program: Program<'info, Metadata>,
 
 }
 
 
 #[account]
 pub struct Vault {
-    nft_name: String
+    user_pubkey: Pubkey,
+    nft_token_account: Pubkey,
+    stake_start: u64,
+    is_initialize: bool,
+    stake_state: StakeState,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
+#[derive(InitSpace)]
+pub enum StakeState {
+    Staked,
+    Unstaked,
 }
 
 
