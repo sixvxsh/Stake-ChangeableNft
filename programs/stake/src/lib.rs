@@ -1,6 +1,7 @@
 use std::fs::Metadata;
 
-use anchor_lang::{prelude::*, solana_program::stake::state::StakeState};
+use anchor_lang::{prelude::*, solana_program::stake::state::StakeState as OtherStakeState};
+
 use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Approve, Mint, MintTo, Revoke, Token, TokenAccount},
@@ -14,6 +15,12 @@ use mpl_token_metadata::{
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_lang::Space;
 
+use anchor_spl::{
+    associated_token,
+    token,
+    
+};
+
 
 declare_id!("37HsMb2NSamepLG98j7MyYiB9E5tDBzsPYWVmoR32sJ2");
 
@@ -21,10 +28,38 @@ declare_id!("37HsMb2NSamepLG98j7MyYiB9E5tDBzsPYWVmoR32sJ2");
 pub mod stake {
     use super::*;
 
-    pub fn stake_swap(
-        _ctx: Context<Stake>, nft_name: String, wanted_nft: String) -> Result<()> {
+    pub fn stake_swap(ctx: Context<Stake>, nft_name: String, wanted_nft: String) -> Result<()> {
 
-            require!()
+
+        if !ctx.accounts.stake_vault.is_initialize {
+            ctx.accounts.stake_vault.is_initialize = true;
+        }
+
+        require!(ctx.accounts.stake_vault.stake_state == StakeState::Unstaked,
+            //Error
+        );
+
+        let clock = Clock::get().unwrap();
+
+
+        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        let cpi_approve_accounts = Approve {
+            to: ctx.accounts.nft_token_account.to_account_info(),
+            delegate: ctx.accounts.program_authority.to_account_info(),
+            authority: ctx.accounts.user.to_account_info(),
+        };
+        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+
+        token::approve(cpi_approve_ctx , 1);
+
+
+
+        
+
+
+
+
+
 
         Ok(())
     }
@@ -50,6 +85,9 @@ pub struct Stake<'info> {
     )]
     pub nft_token_account: Account<'info, TokenAccount>,
     pub nft_mint: Account<'info, Mint>,
+
+    #[account(mut , seeds= ["authority".as_bytes().as_ref()] , bump)]
+    pub program_authority: UncheckedAccount<'info>,
 
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
