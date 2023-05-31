@@ -8,6 +8,7 @@ use anchor_spl::{
 };
 
 use mpl_token_metadata::{
+    
     instruction::{freeze_delegated_account, thaw_delegated_account},
     ID as MetadataTokenId,
 };
@@ -26,9 +27,11 @@ declare_id!("37HsMb2NSamepLG98j7MyYiB9E5tDBzsPYWVmoR32sJ2");
 
 #[program]
 pub mod stake {
+    use anchor_lang::solana_program::example_mocks::solana_sdk::signers;
+
     use super::*;
 
-    pub fn stake_swap(ctx: Context<Stake>, nft_name: String, wanted_nft: String) -> Result<()> {
+    pub fn stake_swap(ctx: Context<Stake>, nft_name: String, nft_req: String) -> Result<()> {
 
 
         if !ctx.accounts.stake_vault.is_initialize {
@@ -38,13 +41,48 @@ pub mod stake {
         require!(ctx.accounts.stake_vault.stake_state == StakeState::Unstaked,
             //Error
         );
-
         let clock = Clock::get().unwrap();
 
 
 
-        // CPI WITH TOKEN PROGRAM FOR APPROVING
+        // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
+        // YES
 
+        //1- unfreeze from prog_auth
+        //2- transfer the nft delegate to user
+        //3- transfer to user wallet
+
+        let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
+
+        msg!("UNFREEZE NFT DELEGATE FROM PROGRAM AUTHORITY");
+        invoke_signed(
+            &thaw_delegated_account(
+                ctx.accounts.metadata_program.key(), 
+                ctx.accounts.program_authority.key(), 
+                ctx.accounts.nft_token_account.key(), 
+                ctx.accounts.nft_edition.key(), 
+                ctx.accounts.nft_mint.key()
+            ),
+            &[
+                ctx.accounts.metadata_program.to_account_info(),
+                ctx.accounts.nft_edition.to_account_info(),
+                ctx.accounts.nft_mint.to_account_info(),
+                ctx.accounts.nft_token_account.to_account_info(),
+                ctx.accounts.program_authority.to_account_info()
+            ], 
+            &[&[&[signers]]]
+        );
+
+        msg!("TRANSFER THE NFT REQUESTED DELEGATE TO USER");
+
+
+
+
+
+
+
+        // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
+        // NO
         msg!("CPI WITH TOKEN PROGRAM FOR DELEGATE APPROVING..");
 
         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
@@ -62,18 +100,19 @@ pub mod stake {
                 ctx.accounts.metadata_program.key(), 
                 ctx.accounts.program_authority.key(),
                 ctx.accounts.nft_token_account.key(),
-                edition,
-                ctx.accounts.nft_mint.key()
+                ctx.accounts.nft_edition.key(),
+                ctx.accounts.nft_mint.key(),
             ),
             &[
                 ctx.accounts.program_authority.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
                 ctx.accounts.nft_token_account.to_account_info(),
-                //ctx.accounts.edition
+                ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.metadata_program.to_account_info(),
             ],
-            &[&[&[user]]]
+            &[&[&[signers]]]
         );
+
 
 
 
@@ -113,14 +152,19 @@ pub struct Stake<'info> {
     #[account(mut , seeds= ["authority".as_bytes().as_ref()] , bump)]
     pub program_authority: UncheckedAccount<'info>,
 
+
+    pub nft_edition: UncheckedAccount<'info>,
+
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+    
     pub metadata_program: Program<'info, Metadata>,
 
 }
 
 
 #[account]
+#[derive(InitSpace)]
 pub struct Vault {
     user_pubkey: Pubkey,
     nft_token_account: Pubkey,
