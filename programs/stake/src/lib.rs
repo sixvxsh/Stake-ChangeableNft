@@ -104,12 +104,6 @@ pub mod stake {
             &[&[&[signers]]]
         );
 
-
-
-
-
-
-
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
         // NO
         msg!("CPI WITH TOKEN PROGRAM FOR DELEGATE APPROVING..");
@@ -121,8 +115,8 @@ pub mod stake {
             authority: ctx.accounts.user.to_account_info(),
         };
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-
         token::approve(cpi_approve_ctx , 1);
+
         let authority_bump = *ctx.bumps.get("program_authority").unwrap();
         invoke_signed(
             &freeze_delegated_account(
@@ -139,19 +133,14 @@ pub mod stake {
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.metadata_program.to_account_info(),
             ],
-            &[&[&[signers]]]
+            &[&[b"authority", &[authority_bump]]],
         );
 
-
-
-
-
-
-
-
-
-
-
+        ctx.accounts.stake_vault.token_account = ctx.accounts.nft_token_account.key();
+        ctx.accounts.stake_vault.user_pubkey = ctx.accounts.user.key();
+        ctx.accounts.stake_vault.stake_state = StakeState::Staked;
+        ctx.accounts.stake_vault.stake_start = clock.unix_timestamp;
+                                                                
 
         Ok(())
     }
@@ -186,7 +175,6 @@ pub struct Stake<'info> {
 
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
-    
     pub metadata_program: Program<'info, Metadata>,
 
 }
@@ -196,7 +184,7 @@ pub struct Stake<'info> {
 #[derive(InitSpace)]
 pub struct Vault {
     user_pubkey: Pubkey,
-    nft_token_account: Pubkey,
+    token_account: Pubkey,
     stake_start: u64,
     is_initialize: bool,
     stake_state: StakeState,
