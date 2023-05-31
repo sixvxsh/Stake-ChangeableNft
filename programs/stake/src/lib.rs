@@ -75,6 +75,35 @@ pub mod stake {
 
         msg!("TRANSFER THE NFT REQUESTED DELEGATE TO USER");
 
+        let cpi_program2 = ctx.accounts.token_program.to_account_info();
+        let cpi_accounts2 = Approve {
+            to: ctx.accounts.nft_req.to_account_info(),
+            delegate: ctx.accounts.user.to_account_info(),
+            authority: ctx.accounts.program_authority.to_account_info(),
+        };
+
+        let cpi_approve2_ctx = CpiContext::new(cpi_program2, cpi_accounts2);
+        token::approve(cpi_approve2_ctx , 1);
+
+        msg!("FREEZ AUTHORITY NFT REQUESTED TO USER WANTED");
+        invoke_signed(
+            &freeze_delegated_account(
+                ctx.accounts.metadata_program.key(), 
+                ctx.accounts.user.key(), 
+                ctx.accounts.nft_req.key(), 
+                ctx.accounts.nft_edition.key(), 
+                ctx.accounts.nft_mint.key()
+            ), 
+            &[
+                ctx.accounts.metadata_program.to_account_info(),
+                ctx.accounts.user.to_account_info(),
+                ctx.accounts.nft_req.to_account_info(),
+                ctx.accounts.nft_edition.to_account_info(),
+                ctx.accounts.nft_mint.to_account_info(),
+            ],
+            &[&[&[signers]]]
+        );
+
 
 
 
