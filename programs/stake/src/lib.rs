@@ -65,8 +65,8 @@ pub mod stake {
         
         let cpi_approve_program =  ctx.accounts.token_program.to_account_info();
         let cpi_approve_accounts =  token::Approve {
-            to: ctx.accounts.token_account_nft_a.to_account_info(),
-            delegate: ctx.program_authority.to_account_info(),
+            to: ctx.accounts.nft_a_token_account.to_account_info(),
+            delegate: ctx.accounts.program_authority.to_account_info(),
             authority: ctx.accounts.user.to_account_info(),
         };
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program , cpi_approve_accounts);
@@ -79,18 +79,18 @@ pub mod stake {
             &freeze_delegated_account(
                 ctx.accounts.token_program.key(), 
                 ctx.accounts.program_authority.key(), 
-                ctx.accounts.token_account_nft_a.key(), 
+                ctx.accounts.nft_a_token_account.key(), 
                 ctx.accounts.nft_edition.key(), 
                 ctx.accounts.nft_mint.key()
             ), 
             &[
                 ctx.accounts.token_program.to_account_info(),
-                ctx.accounts.token_account_nft_a.to_account_info(),
+                ctx.accounts.nft_a_token_account.to_account_info(),
                 ctx.accounts.program_authority.to_account_info(),
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
             ], 
-            &[&[&[signers]]],
+            &[&[&[ctx.accounts.program_authority.key()]]],
         );
 
      // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
@@ -101,7 +101,7 @@ pub mod stake {
             &thaw_delegated_account(
                 ctx.accounts.metadata_program.key(), 
                 ctx.accounts.program_authority.key(), 
-                ctx.accounts.token_account_nft_b.key(), 
+                ctx.accounts.nft_b_token_account.key(), 
                 ctx.accounts.nft_edition.key(), 
                 ctx.accounts.nft_mint.key()
             ),
@@ -109,7 +109,7 @@ pub mod stake {
                 ctx.accounts.metadata_program.to_account_info(),
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
-                ctx.accounts.token_account_nft_b.to_account_info(),
+                ctx.accounts.nft_b_token_account.to_account_info(),
                 ctx.accounts.program_authority.to_account_info()
             ], 
             &[&[&[signers]]]
@@ -120,7 +120,7 @@ pub mod stake {
 
         let cpi_program2 = ctx.accounts.token_program.to_account_info();
         let cpi_accounts2 = Approve {
-            to: ctx.accounts.token_account_nft_b.to_account_info(),
+            to: ctx.accounts.nft_b_token_account.to_account_info(),
             delegate: ctx.accounts.user.to_account_info(),
             authority: ctx.accounts.program_authority.to_account_info(),
         };
@@ -128,24 +128,24 @@ pub mod stake {
         let cpi_approve2_ctx = CpiContext::new(cpi_program2, cpi_accounts2);
         token::approve(cpi_approve2_ctx , 1);
 
-        msg!("PHASE 2");
+        msg!("FIRST SCENARIO - PHASE 2");
         msg!("3- FREEZ AUTHORITY NFT_B TO USER");
         invoke_signed(
             &freeze_delegated_account(
                 ctx.accounts.metadata_program.key(), 
                 ctx.accounts.user.key(), 
-                ctx.accounts.token_account_nft_b.key(), 
+                ctx.accounts.nft_b_token_account.key(), 
                 ctx.accounts.nft_edition.key(), 
                 ctx.accounts.nft_mint.key()
             ), 
             &[
                 ctx.accounts.metadata_program.to_account_info(),
                 ctx.accounts.user.to_account_info(),
-                ctx.accounts.nft_req.to_account_info(),
+                ctx.accounts.nft_b_token_account.to_account_info(),
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
             ],
-            &[&[&[signers]]]
+            &[&[&[Delegate]]]
         );
 
         msg!(" FIRST SCENARIO - PHASE 2");
@@ -177,7 +177,7 @@ pub mod stake {
 
         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
         let cpi_approve_accounts = Approve {
-            to: ctx.accounts.nftA_token_account.to_account_info(),
+            to: ctx.accounts.nft_a_token_account.to_account_info(),
             delegate: ctx.accounts.program_authority.to_account_info(),
             authority: ctx.accounts.user.to_account_info(),
         };
@@ -193,14 +193,14 @@ pub mod stake {
             &freeze_delegated_account(
                 ctx.accounts.metadata_program.key(), 
                 ctx.accounts.program_authority.key(),
-                ctx.accounts.nftA_token_account.key(),
+                ctx.accounts.nft_a_token_account.key(),
                 ctx.accounts.nft_edition.key(),
                 ctx.accounts.nft_mint.key(),
             ),
             &[
                 ctx.accounts.program_authority.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
-                ctx.accounts.nftA_token_account.to_account_info(),
+                ctx.accounts.nft_a_token_account.to_account_info(),
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.metadata_program.to_account_info(),
             ],
@@ -235,13 +235,14 @@ pub struct Stake<'info> {
         associated_token::mint=nft_mint,
         associated_token::authority=user
     )]
-    pub nft_token_account: Account<'info, TokenAccount>,
+    pub nft_a_token_account: Account<'info, TokenAccount>,
+    pub nft_b_token_account: Account<'info, TokenAccount>,
     pub nft_mint: Account<'info, Mint>,
 
     #[account(mut , seeds= ["authority".as_bytes().as_ref()] , bump)]
     pub program_authority: UncheckedAccount<'info>,
 
-
+    /// CHECK: We're about to create this with Metaplex
     pub nft_edition: UncheckedAccount<'info>,
 
     pub system_program: Program<'info, System>,
@@ -267,62 +268,6 @@ pub enum StakeState {
     Staked,
     Unstaked,
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
