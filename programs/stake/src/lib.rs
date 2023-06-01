@@ -60,7 +60,7 @@ pub mod stake {
         //3- freeze authority of nft_B (to user)
         //3- transfer nft_B to user wallet
 
-        msg!("PHASE 1");
+        msg!("FIRST SCENARIO - PHASE 1");
         msg!("1- TAKE DELEGATE FOR NFT_A FROM USER ");
         
         let cpi_approve_program =  ctx.accounts.token_program.to_account_info();
@@ -73,8 +73,8 @@ pub mod stake {
 
         token::approve(cpi_approve_ctx , 1);
 
-        msg!("PHASE 1");
-        msg!("2- FREEZE AUTRHORITY TO PROGRAM TO NFT_A ");
+        msg!("FIRST SCENARIO - PHASE 1");
+        msg!("2- FREEZE AUTRHORITY TO PROGRAM FOR NFT_A ");
         invoke_signed(
             &freeze_delegated_account(
                 ctx.accounts.token_program.key(), 
@@ -95,7 +95,7 @@ pub mod stake {
 
      // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
 
-        msg!("PHASE 2");
+        msg!("FIRST SCENARIO - PHASE 2");
         msg!("1- UNFREEZE NFT_B DELEGATE FROM PROGRAM AUTHORITY");
         invoke_signed(
             &thaw_delegated_account(
@@ -115,7 +115,7 @@ pub mod stake {
             &[&[&[signers]]]
         );
 
-        msg!("PHASE 2");
+        msg!("FIRST SCENARIO - PHASE 2");
         msg!("2- TRANSFER DELEGATE OF THE NFT_B TO USER");
 
         let cpi_program2 = ctx.accounts.token_program.to_account_info();
@@ -128,7 +128,7 @@ pub mod stake {
         let cpi_approve2_ctx = CpiContext::new(cpi_program2, cpi_accounts2);
         token::approve(cpi_approve2_ctx , 1);
 
-        msg!("PHASE 2")
+        msg!("PHASE 2");
         msg!("3- FREEZ AUTHORITY NFT_B TO USER");
         invoke_signed(
             &freeze_delegated_account(
@@ -148,7 +148,7 @@ pub mod stake {
             &[&[&[signers]]]
         );
 
-        msg!("PHASE 2");
+        msg!(" FIRST SCENARIO - PHASE 2");
         msg!("4- TRANSFER NFT_B TO USER WALLET");
 
         let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
@@ -164,7 +164,7 @@ pub mod stake {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         // {{ SECOND SCENARIO }}
-        
+
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
         // NO
 
@@ -172,31 +172,35 @@ pub mod stake {
         //1- Take delegate of nft_A from user (to program)
         //2- Freeze authority of nft_A (to program)
 
-
-        msg!("CPI WITH TOKEN PROGRAM FOR DELEGATE APPROVING..");
+        msg!("SECOND SCENARIO - PHASE 1");
+        msg!("1- TAKE DELEGATE FOR NFT_A FROM USER ");
 
         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
         let cpi_approve_accounts = Approve {
-            to: ctx.accounts.nft_token_account.to_account_info(),
+            to: ctx.accounts.nftA_token_account.to_account_info(),
             delegate: ctx.accounts.program_authority.to_account_info(),
             authority: ctx.accounts.user.to_account_info(),
         };
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
         token::approve(cpi_approve_ctx , 1);
 
+
+
         let authority_bump = *ctx.bumps.get("program_authority").unwrap();
+        msg!("SECOND SCENARIO - PHASE 1");
+        msg!("2- FREEZE AUTRHORITY TO PROGRAM FOR NFT_A");
         invoke_signed(
             &freeze_delegated_account(
                 ctx.accounts.metadata_program.key(), 
                 ctx.accounts.program_authority.key(),
-                ctx.accounts.nft_token_account.key(),
+                ctx.accounts.nftA_token_account.key(),
                 ctx.accounts.nft_edition.key(),
                 ctx.accounts.nft_mint.key(),
             ),
             &[
                 ctx.accounts.program_authority.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
-                ctx.accounts.nft_token_account.to_account_info(),
+                ctx.accounts.nftA_token_account.to_account_info(),
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.metadata_program.to_account_info(),
             ],
