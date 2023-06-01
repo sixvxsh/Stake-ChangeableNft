@@ -69,8 +69,9 @@ pub mod stake {
 
         
         // msg!("SECOND SCENARIO - PHASE 1");
-        let authority_bump = *ctx.bumps.get("program_authority").unwrap();
+        
         msg!("2- FREEZE AUTRHORITY TO PROGRAM FOR NFT_A");
+        let authority_bump = *ctx.bumps.get("program_authority").unwrap();
         invoke_signed(
             &freeze_delegated_account(
                 ctx.accounts.metadata_program.key(), 
@@ -92,7 +93,8 @@ pub mod stake {
         ctx.accounts.stake_vault.token_account = ctx.accounts.nft_a_token_account.key();
         ctx.accounts.stake_vault.user_pubkey = ctx.accounts.user.key();
         ctx.accounts.stake_vault.stake_state = StakeState::Staked;
-        ctx.accounts.stake_vault.stake_start = clock.unix_timestamp;
+        ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
+        ctx.accounts.stake_vault.is_initialize = true;
                
         Ok(())
     }
