@@ -44,16 +44,17 @@ pub mod stake {
         let clock = Clock::get().unwrap();
 
 
-        // FIRST SCENARIO
+        // {{ FIRST SCENARIO }}
+
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
         // YES
 
-        //First Phase
+        // { First Phase }
         //1- Take delegate of nft_A from user (to program)
         //2- Freeze authority of nft_A (to program)
         
 
-        //Second Phase
+        // { Second Phase }
         //1- unfreeze nft_B delagte from program_authority
         //2- transfer the nft_B delegate to user (approve delegate)
         //3- freeze authority of nft_B (to user)
@@ -100,7 +101,7 @@ pub mod stake {
             &thaw_delegated_account(
                 ctx.accounts.metadata_program.key(), 
                 ctx.accounts.program_authority.key(), 
-                ctx.accounts.nft_token_account.key(), 
+                ctx.accounts.token_account_nft_b.key(), 
                 ctx.accounts.nft_edition.key(), 
                 ctx.accounts.nft_mint.key()
             ),
@@ -108,7 +109,7 @@ pub mod stake {
                 ctx.accounts.metadata_program.to_account_info(),
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
-                ctx.accounts.nft_token_account.to_account_info(),
+                ctx.accounts.token_account_nft_b.to_account_info(),
                 ctx.accounts.program_authority.to_account_info()
             ], 
             &[&[&[signers]]]
@@ -133,7 +134,7 @@ pub mod stake {
             &freeze_delegated_account(
                 ctx.accounts.metadata_program.key(), 
                 ctx.accounts.user.key(), 
-                ctx.accounts.nft_req.key(), 
+                ctx.accounts.token_account_nft_b.key(), 
                 ctx.accounts.nft_edition.key(), 
                 ctx.accounts.nft_mint.key()
             ), 
@@ -162,11 +163,12 @@ pub mod stake {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        // SECOND SCENARIO
+        // {{ SECOND SCENARIO }}
+        
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
         // NO
 
-        //FIRST PHASE 
+        // { FIRST PHASE } 
         //1- Take delegate of nft_A from user (to program)
         //2- Freeze authority of nft_A (to program)
 
