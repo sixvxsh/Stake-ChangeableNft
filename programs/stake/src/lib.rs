@@ -27,7 +27,7 @@ declare_id!("37HsMb2NSamepLG98j7MyYiB9E5tDBzsPYWVmoR32sJ2");
 
 #[program]
 pub mod stake {
-    use anchor_lang::solana_program::example_mocks::solana_sdk::signers;
+    use anchor_lang::{solana_program::example_mocks::solana_sdk::signers, system_program::Transfer};
 
     use super::*;
 
@@ -48,13 +48,53 @@ pub mod stake {
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
         // YES
 
-        //1- unfreeze from prog_auth
-        //2- transfer the nft delegate to user
+        //First Phase
+        //1- Take delegate of its NFT
+        //2- Freeze authority of its NFT
+        
+        //Second Phase
+        //1- unfreeze NFT-REQ delagte from prog_auth
+        //2- transfer the nft delegate to user (approve delegate)
         //3- transfer to user wallet
 
-        let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
+        msg!("PHASE 1");
+        msg!("1-TAKE DELEGATE FROM USER FOR THEYR NFT..");
+        
+        let cpi_approve_program =  ctx.accounts.token_program.to_account_info();
+        let cpi_approve_accounts =  token::Approve {
+            to: ctx.accounts.token_account_nft_a.to_account_info(),
+            delegate: ctx.program_authority.to_account_info(),
+            authority: ctx.accounts.user.to_account_info(),
+        };
+        let cpi_approve_ctx = CpiContext::new(cpi_approve_program , cpi_approve_accounts);
 
-        msg!("UNFREEZE NFT DELEGATE FROM PROGRAM AUTHORITY");
+        token::approve(cpi_approve_ctx , 1);
+
+        msg!("PHASE 1");
+        msg!("2- FREEZE AUTRHORITY FROM USER TO PROGRAM ");
+
+        invoke_signed(
+            &freeze_delegated_account(
+                ctx.accounts.token_program.key(), 
+                ctx.accounts.program_authority.key(), 
+                ctx.accounts.token_account_nft_a.key(), 
+                ctx.accounts.nft_edition.key(), 
+                ctx.accounts.nft_mint.key()
+            ), 
+            &[
+                ctx.accounts.token_program.to_account_info(),
+                ctx.accounts.token_account_nft_a.to_account_info(),
+                ctx.accounts.program_authority.to_account_info(),
+                ctx.accounts.nft_edition.to_account_info(),
+                ctx.accounts.nft_mint.to_account_info(),
+            ], 
+            &[&[&[signers]]],
+        );
+
+     // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
+
+        msg!("PHASE 2");
+        msg!("1- UNFREEZE NFT DELEGATE FROM PROGRAM AUTHORITY");
         invoke_signed(
             &thaw_delegated_account(
                 ctx.accounts.metadata_program.key(), 
@@ -73,11 +113,12 @@ pub mod stake {
             &[&[&[signers]]]
         );
 
-        msg!("TRANSFER THE NFT REQUESTED DELEGATE TO USER");
+        msg!("PHASE 2");
+        msg!("TRANSFER DELEGATE OF THE NFT REQUESTED TO THE USER");
 
         let cpi_program2 = ctx.accounts.token_program.to_account_info();
         let cpi_accounts2 = Approve {
-            to: ctx.accounts.nft_req.to_account_info(),
+            to: ctx.accounts.token_account_nft_b.to_account_info(),
             delegate: ctx.accounts.user.to_account_info(),
             authority: ctx.accounts.program_authority.to_account_info(),
         };
@@ -103,6 +144,17 @@ pub mod stake {
             ],
             &[&[&[signers]]]
         );
+
+        let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
+        let cpi_transfer_accounts = token::Transfer {
+            from: ctx.accounts.program_authority.to_account_info(),
+            to: ctx.accounts.user.to_account_info(),
+            authority: ctx.accounts.program_authority.to_account_info(),
+        };
+        let Cpi_Transfer_Ctx = CpiContext::new(cpi_transfer_program , cpi_transfer_accounts);
+
+        token::transfer(Cpi_Transfer_Ctx , 1);
+
 
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
         // NO
@@ -140,7 +192,7 @@ pub mod stake {
         ctx.accounts.stake_vault.user_pubkey = ctx.accounts.user.key();
         ctx.accounts.stake_vault.stake_state = StakeState::Staked;
         ctx.accounts.stake_vault.stake_start = clock.unix_timestamp;
-                                                                
+               
 
         Ok(())
     }
@@ -176,7 +228,7 @@ pub struct Stake<'info> {
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub metadata_program: Program<'info, Metadata>,
-
+    pub token_metadata_program: Program<'info, Metadata>,
 }
 
 
