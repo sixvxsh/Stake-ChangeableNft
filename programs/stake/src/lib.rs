@@ -119,7 +119,7 @@ pub struct Stake<'info> {
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub metadata_program: Program<'info, Metadata>,
-    pub token_metadata_program: Program<'info, Metadata>,
+    // pub token_metadata_program: Program<'info, Metadata>,
     // pub nft_b_token_account: Account<'info, TokenAccount>,
 }
 
