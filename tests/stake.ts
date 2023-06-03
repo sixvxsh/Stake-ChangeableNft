@@ -3,14 +3,25 @@ import { Program } from "@coral-xyz/anchor";
 import { Stake } from "../target/types/stake";
 
 describe("stake", () => {
-  // Configure the client to use the local cluster.
+
+
+  const provider = anchor.AnchorProvider.env();
+  const wallet = provider.wallet as anchor.Wallet;
   anchor.setProvider(anchor.AnchorProvider.env());
+  const walletPubKey = anchor.AnchorProvider.local().wallet.publicKey;
+  console.log(("===================="));
+  console.log(" WALLET PUBKEY ---->" , walletPubKey);
 
-  const program = anchor.workspace.Stake as Program<Stake>;
 
-  it("Is initialized!", async () => {
-    // Add your test here.
-    const tx = await program.methods.initialize().rpc();
-    console.log("Your transaction signature", tx);
-  });
+  const
+  
+  
+
+
+
+
+
+
+
+
 });

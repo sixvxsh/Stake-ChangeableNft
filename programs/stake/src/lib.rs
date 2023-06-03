@@ -1,25 +1,16 @@
-use std::fs::Metadata;
-
-use anchor_lang::{prelude::*, solana_program::stake::state::StakeState as OtherStakeState};
-
+use anchor_lang::prelude::*;
+use anchor_lang::solana_program::program::invoke_signed;
+use anchor_spl::token;
 use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Approve, Mint, MintTo, Revoke, Token, TokenAccount},
 };
-
 use mpl_token_metadata::{
-    
     instruction::{freeze_delegated_account, thaw_delegated_account},
     ID as MetadataTokenId,
 };
-
-use anchor_lang::solana_program::program::invoke_signed;
+// use mpl_token_metadata::state::Metadata;
 use anchor_lang::Space;
-
-use anchor_spl::{
-    associated_token,
-    token,  
-};
 
 
 declare_id!("37HsMb2NSamepLG98j7MyYiB9E5tDBzsPYWVmoR32sJ2");
@@ -88,7 +79,7 @@ pub mod stake {
                 ctx.accounts.metadata_program.to_account_info(),
             ],
             &[&[b"authority", &[authority_bump]]],
-        );
+        )?;
 
         ctx.accounts.stake_vault.token_account = ctx.accounts.nft_a_token_account.key();
         ctx.accounts.stake_vault.user_pubkey = ctx.accounts.user.key();
@@ -109,7 +100,7 @@ pub struct Stake<'info> {
         payer = user,
         space = 8 + UserStakeInfo::INIT_SPACE)]
     pub stake_vault: Account<'info, UserStakeInfo>,
-
+    /// CHECK: Manual validation
     #[account(mut , seeds= ["authority".as_bytes().as_ref()] , bump)]
     pub program_authority: UncheckedAccount<'info>,
 
@@ -129,7 +120,6 @@ pub struct Stake<'info> {
     pub token_program: Program<'info, Token>,
     pub metadata_program: Program<'info, Metadata>,
     pub token_metadata_program: Program<'info, Metadata>,
-
     // pub nft_b_token_account: Account<'info, TokenAccount>,
 }
 
@@ -165,6 +155,14 @@ pub enum StakeError {
     InvalidStakeState,
 }
 
+#[derive(Clone)]
+pub struct Metadata;
+
+impl anchor_lang::Id for Metadata {
+    fn id() -> Pubkey {
+        MetadataTokenId
+    }
+}
 
 
 
