@@ -20,9 +20,6 @@ import { TOKEN_PROGRAM_ID, createMint, getAssociatedTokenAddress } from "@solana
 
 
 
-
-
-
 describe("stake", () => {
 
   console.log(`
@@ -105,9 +102,9 @@ describe("stake", () => {
     }
   };
 
-  Mintnft(program , wallet);
+  Mintnft(program, wallet);
   console.log("MINT nft FUNCTION CALLED");
-  
+
 
   const BLOCKHASH = async () => {
     const { blockhash, lastValidBlockHeight } = await program.provider.connection.getLatestBlockhash("finalized");
@@ -116,7 +113,6 @@ describe("stake", () => {
       lastValidBlockHeight: lastValidBlockHeight
     }
   };
-
 
   const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
     units: 1000000
@@ -127,36 +123,6 @@ describe("stake", () => {
   });
 
 
-
-
-
-  // //FIND PDA FOR METADATA
-  // const metadataAddress = anchor.web3.PublicKey.findProgramAddressSync(
-  //   [
-  //     Buffer.from("metadata"),
-  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-  //     MintKey.publicKey.toBuffer(),
-  //   ],
-  //   TOKEN_METADATA_PROGRAM_ID
-  // )[0];
-  // console.log("-----------------------");
-  // console.log(`metadata initialized and its address ===> ${metadataAddress}`);
-
-  //FIND PDA FOR MASTER EDITION
-  // const masterEditionAddress = (anchor.web3.PublicKey.findProgramAddressSync(
-  //   [
-  //     Buffer.from("metadata"),
-  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-  //     MintKey.publicKey.toBuffer(),
-  //     Buffer.from("edition"),
-  //   ],
-  //   TOKEN_METADATA_PROGRAM_ID,
-  // ))[0];
-  // console.log("-----------------------");
-  // console.log(
-  //   `Master edition metadata initialized and its address ===> ${masterEditionAddress}`);
-
-
   let Program_Authority: anchor.web3.PublicKey
   let UserStakeInfoPda: anchor.web3.PublicKey
   let nft: any
@@ -165,45 +131,60 @@ describe("stake", () => {
   let NftAtokenAddress: anchor.web3.PublicKey
 
 
-  it('IT STAKE', async => {
+  it('IT STAKE', async () => {
 
     try {
-      const StakeIx = program.methods
-        .stakeSwap()
-        .accounts({
-          metadataProgram:TOKEN_METADATA_PROGRAM_ID,
-          nftAEdition: nft.masterEditionAddress,
-          nftAMint: nft.mint,
-          nftATokenAccount: NftAtokenAddress,
-          programAuthority: Program_Authority ,
-          stakeVault:UserStakeInfoPda,
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          user: wallet.publicKey,
-        })
-        .signers([wallet.payer])
-        .instruction()
+      let StakeIx = await program.methods
+      .stakeSwap()
+      .accounts({
+        metadataProgram: TOKEN_METADATA_PROGRAM_ID,
+        nftAEdition: nft.masterEditionAddress,
+        nftAMint: nft.mint,
+        nftATokenAccount: NftAtokenAddress,
+        programAuthority: Program_Authority,
+        stakeVault: UserStakeInfoPda,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        user: wallet.publicKey,
+      })
+      .signers([wallet.payer])
+      .instruction()
+
+      const StakeTx = new Transaction()
+      .add(addPriorityFee)
+      .add(modifyComputeUnits)
+      .add(StakeIx)
+      console.log("INSTRUCTIONS ADDED TO STAKE TX");
+
+      const blockhashData = await BLOCKHASH();
+      const { blockhash, lastValidBlockHeight } = blockhashData;
+      console.log("-----------------------");
+      console.log("RECENT BLOCKHASH =====>" , blockhash );
+      console.log("-----------------------");
+      console.log( "lastValidBlockHeight =====>", lastValidBlockHeight);
+
+      StakeTx.recentBlockhash = blockhash;
+      StakeTx.feePayer = wallet.publicKey;
+
+
+      try {
+        const sendStakeTx = await sendAndConfirmTransaction(provider.connection , StakeTx , [wallet.payer] );
+        console.log("-----------------------");
+        console.log("SEND AND CONFIRM STAKE TRANSACTION SIGNATURE =====>" , sendStakeTx);
+
+        const result = await provider.connection.getParsedTransaction(sendStakeTx , "confirmed");
+        console.log("-----------------------");
+        console.log("STAKE TX RESULT =====>", result);
+
+      } catch (error) {
+        console.log("ERROR IN STAKE TRY TX");
+        console.error(Error);
+      }
 
     } catch (error) {
-      
+      console.log(`STAKE ERROR IN BIG PICTURE MINT ${error}`);
     }
 
 
-
-
-
-
-
-
-  })
-
-
-
-
-
-
-
-
-
-
+  });
 });
