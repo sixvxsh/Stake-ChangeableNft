@@ -39,72 +39,10 @@ describe("stake", () => {
   const program = anchor.workspace.Stake as Program<Stake>;
 
 
-  const Mintnft = async (program, payer) => {
-    const metaplex = Metaplex.make(program.provider.connection)
-      .use(keypairIdentity(payer))
-      .use(bundlrStorage())
-
-    const nft = await metaplex
-      .nfts()
-      .create({
-        uri: "https://storage.googleapis.com/fractal-launchpad-public-assets/honeyland/assets_gold_pass/57.json",
-        name: "Gold Pass #057",
-        sellerFeeBasisPoints: 0,
-      })
+ 
 
 
-    console.log("nft METADATA PUBKEY: ", nft.metadataAddress.toBase58());
-    console.log("nft A TOKEN ADDRESS: ", nft.tokenAddress.toBase58());
-
-
-    const [Program_Authority] = await anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("authority")],
-      program.programId
-    );
-
-    const [UserStakeInfoPda] = await anchor.web3.PublicKey.findProgramAddressSync(
-      [payer.publicKey.toBuffer(), nft.tokenAddress.toBuffer()],
-      program.programId
-    );
-
-    console.log("PROGRAM AUTHORITY PDA: ", Program_Authority.toBase58());
-    console.log("USER STAKE INFO PDA: ", UserStakeInfoPda.toBase58());
-
-
-    const [mintAuth] = await anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("mint")],
-      program.programId
-    )
-
-    const mint = await createMint(
-      program.provider.connection,
-      payer,
-      mintAuth,
-      null,
-      2
-    )
-    console.log("Mint pubkey: ", mint.toBase58())
-
-    const NftAtokenAddress = await getAssociatedTokenAddress(
-      mint,
-      payer.publicKey)
-
-    console.log("-----------------------");
-    console.log(`nft A Token Address (ATA) address ===> ${NftAtokenAddress}`);
-
-    return {
-      nft: nft,
-      Program_Authority: Program_Authority,
-      UserStakeInfoPda: UserStakeInfoPda,
-      mint: mint,
-      mintAuth: mintAuth,
-      NftAtokenAddress: NftAtokenAddress,
-    }
-  };
-
-  Mintnft(program, wallet);
-  console.log("MINT nft FUNCTION CALLED");
-
+  
 
   const BLOCKHASH = async () => {
     const { blockhash, lastValidBlockHeight } = await program.provider.connection.getLatestBlockhash("finalized");
@@ -129,50 +67,51 @@ describe("stake", () => {
   let mintAuth: anchor.web3.PublicKey
   let mint: anchor.web3.PublicKey
   let NftAtokenAddress: anchor.web3.PublicKey
+  let nftMasteredition: anchor.web3.PublicKey
 
 
   it('IT STAKE', async () => {
 
     try {
       let StakeIx = await program.methods
-      .stakeSwap()
-      .accounts({
-        metadataProgram: TOKEN_METADATA_PROGRAM_ID,
-        nftAEdition: nft.masterEditionAddress,
-        nftAMint: nft.mint,
-        nftATokenAccount: NftAtokenAddress,
-        programAuthority: Program_Authority,
-        stakeVault: UserStakeInfoPda,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        user: wallet.publicKey,
-      })
-      .signers([wallet.payer])
-      .instruction()
+        .stakeSwap()
+        .accounts({
+          metadataProgram: TOKEN_METADATA_PROGRAM_ID,
+          nftAEdition: nftMasteredition,
+          nftAMint: mint,
+          nftATokenAccount: NftAtokenAddress,
+          programAuthority: Program_Authority,
+          stakeVault: UserStakeInfoPda,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          user: wallet.publicKey,
+        })
+        .signers([wallet.payer])
+        .instruction()
 
       const StakeTx = new Transaction()
-      .add(addPriorityFee)
-      .add(modifyComputeUnits)
-      .add(StakeIx)
+        .add(addPriorityFee)
+        .add(modifyComputeUnits)
+        .add(StakeIx)
       console.log("INSTRUCTIONS ADDED TO STAKE TX");
 
       const blockhashData = await BLOCKHASH();
       const { blockhash, lastValidBlockHeight } = blockhashData;
       console.log("-----------------------");
-      console.log("RECENT BLOCKHASH =====>" , blockhash );
+      console.log("RECENT BLOCKHASH =====>", blockhash);
       console.log("-----------------------");
-      console.log( "lastValidBlockHeight =====>", lastValidBlockHeight);
+      console.log("lastValidBlockHeight =====>", lastValidBlockHeight);
 
       StakeTx.recentBlockhash = blockhash;
       StakeTx.feePayer = wallet.publicKey;
 
 
       try {
-        const sendStakeTx = await sendAndConfirmTransaction(provider.connection , StakeTx , [wallet.payer] );
+        const sendStakeTx = await sendAndConfirmTransaction(provider.connection, StakeTx, [wallet.payer]);
         console.log("-----------------------");
-        console.log("SEND AND CONFIRM STAKE TRANSACTION SIGNATURE =====>" , sendStakeTx);
+        console.log("SEND AND CONFIRM STAKE TRANSACTION SIGNATURE =====>", sendStakeTx);
 
-        const result = await provider.connection.getParsedTransaction(sendStakeTx , "confirmed");
+        const result = await provider.connection.getParsedTransaction(sendStakeTx, "confirmed");
         console.log("-----------------------");
         console.log("STAKE TX RESULT =====>", result);
 
