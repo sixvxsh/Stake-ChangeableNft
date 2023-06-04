@@ -35,10 +35,10 @@ pub mod stake {
 
         msg!("FIRST SCENARIO ");
 
-        require!(
-            ctx.accounts.stake_vault.stake_state == StakeState::Unstaked,
-            StakeError::AlreadyStaked
-        );
+        // require!(
+        //     ctx.accounts.stake_vault.stake_state == StakeState::Unstaked,
+        //     StakeError::AlreadyStaked
+        // );
 
         if !ctx.accounts.stake_vault.is_initialize {
             ctx.accounts.stake_vault.is_initialize = true;

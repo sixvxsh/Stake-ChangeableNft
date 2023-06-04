@@ -78,9 +78,8 @@ describe("STAKE", () => {
     console.log("THE BEGINING OF IT STAKE ...");
 
 
-    const [delegatedAuthPda , _ ] = await anchor.web3.PublicKey.findProgramAddressSync(
+    const [delegatedAuthPda] = await anchor.web3.PublicKey.findProgramAddressSync(
       [
-        wallet.publicKey.toBuffer(),
         Buffer.from("authority")
       ],
       program.programId
@@ -89,7 +88,7 @@ describe("STAKE", () => {
     console.log("DELAGATED AUTH PDA", delegatedAuthPda);
 
 
-    const [UserStakeInfoPda , _bump ] = await anchor.web3.PublicKey.findProgramAddressSync(
+    const [UserStakeInfoPda ] = await anchor.web3.PublicKey.findProgramAddressSync(
       [wallet.publicKey.toBuffer(),
       TokenAddress.toBuffer()],
       program.programId
