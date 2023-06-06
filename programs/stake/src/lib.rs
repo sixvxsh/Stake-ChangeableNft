@@ -99,7 +99,7 @@ pub mod stake {
         //3- transfer nft_B to user wallet
 
         msg!("SECOND SCENARIO - PHASE 1");
-        msg!("1- TAKING DELEGATE FOR NFT_A FROM USER... ");
+        msg!("1- TAKING DELEGATE FOR NFT_A FROM USER TO PROGRAM... ");
 
         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
         let cpi_approve_accounts = token::Approve {
@@ -108,12 +108,11 @@ pub mod stake {
             authority: ctx.accounts.user.to_account_info(),
         };
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-
         token::approve(cpi_approve_ctx, 1)?;
-        msg!("1- TAKED DELEGATE FOR NFT_A FROM USER... ");
+        msg!("TAKED DELEGATE FOR NFT_A FROM USER... ");
 
         msg!("SECOND SCENARIO - PHASE 1");
-        msg!("2- FREEZEING AUTRHORITY TO PROGRAM FOR NFT_A ");
+        msg!("2- FREEZING AUTRHORITY OF NFT_A FROM USER TO PROGRAM... ");
         invoke_signed(
             &freeze_delegated_account(
                 ctx.accounts.token_program.key(),
@@ -131,11 +130,12 @@ pub mod stake {
             ],
             &[&[b"authority", &[authority_bump]]],
         )?;
+        msg!("2- FREEZED AUTRHORITY OF NFT_A FROM USER TO PROGRAM. ");
 
         let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
 
         msg!("SECOND SCENARIO - PHASE 2");
-        msg!("1- UNFREEZE NFT_B DELEGATE FROM PROGRAM AUTHORITY");
+        msg!("1- UNFREEZING AUTHORITY OF NFT_B FROM PROGRAM AUTHORITY");
         invoke_signed(
             &thaw_delegated_account(
                 ctx.accounts.metadata_program.key(),
@@ -153,9 +153,10 @@ pub mod stake {
             ],
             &[&[&[signers]]],
         )?;
+        msg!(" UNFREEZED AUTHORITY OF NFT_B FROM PROGRAM AUTHORITY");
 
         msg!("SECOND SCENARIO - PHASE 2");
-        msg!("2- TRANSFER DELEGATE OF THE NFT_B TO USER");
+        msg!("2- TAKING DELEGATE OF NFT_B FROM PROGRAM TO USER...");
 
         let cpi_approve_to_user_program = ctx.accounts.token_program.to_account_info();
         let cpi_approve_to_user_accounts = Approve {
@@ -163,13 +164,13 @@ pub mod stake {
             delegate: ctx.accounts.user.to_account_info(),
             authority: ctx.accounts.program_authority.to_account_info(),
         };
-
         let cpi_approve2_ctx =
             CpiContext::new(cpi_approve_to_user_program, cpi_approve_to_user_accounts);
         token::approve(cpi_approve2_ctx, 1)?;
+        msg!("2- TAKED DELEGATE OF NFT_B FROM PROGRAM TO USER...");
 
         msg!("SECOND SCENARIO - PHASE 2");
-        msg!("3- FREEZ AUTHORITY NFT_B TO USER");
+        msg!("3- FREEZING AUTHORITY OF NFT_B TO USER ...");
         invoke_signed(
             &freeze_delegated_account(
                 ctx.accounts.metadata_program.key(),
@@ -187,9 +188,10 @@ pub mod stake {
             ],
             &[&[&[Delegate]]],
         );
+        msg!("FREEZED AUTHORITY OF NFT_B TO USER.");
 
         msg!(" SECOND SCENARIO - PHASE 2");
-        msg!("4- TRANSFER NFT_B TO USER WALLET");
+        msg!("4- TRANSFERING NFT_B FROM PROGRAM TO USER WALLET ...");
 
         let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
         let cpi_transfer_accounts = token::Transfer {
@@ -198,8 +200,8 @@ pub mod stake {
             authority: ctx.accounts.program_authority.to_account_info(),
         };
         let Cpi_Transfer_Ctx = CpiContext::new(cpi_transfer_program, cpi_transfer_accounts);
-
         token::transfer(Cpi_Transfer_Ctx, 1)?;
+        msg!(" TRANSFERED NFT_B FROM PROGRAM TO USER WALLET");
 
         Ok(())
     }
@@ -227,9 +229,14 @@ pub struct Stake<'info> {
     )]
     pub nft_a_token_account: Account<'info, TokenAccount>,
     pub nft_a_mint: Account<'info, Mint>,
+    pub nft_b_mint: Account<'info, Mint>,
     /// CHECK: We're about to create this with Metaplex
     #[account(owner=MetadataTokenId)]
     pub nft_a_edition: UncheckedAccount<'info>,
+
+    #[account(owner=MetadataTokenId)]
+    pub nft_b_edition: UncheckedAccount<'info>,
+
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub metadata_program: Program<'info, Metadata>,
