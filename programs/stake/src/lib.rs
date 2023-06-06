@@ -75,23 +75,22 @@ pub mod stake {
             &[&[b"authority", &[authority_bump]]],
         )?;
 
-        ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
-        ctx.accounts.stake_vault.users_pubkey = ctx.accounts.user.key();
-        ctx.accounts.stake_vault.stake_state = StakeState::Staked;
-        ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
-        ctx.accounts.stake_vault.is_initialize = true;
+        // ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
+        // ctx.accounts.stake_vault.users_pubkey = ctx.accounts.user.key();
+        // ctx.accounts.stake_vault.stake_state = StakeState::Staked;
+        // ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
+        // ctx.accounts.stake_vault.is_initialize = true;
 
 
         let vault = &mut ctx.accounts.stake_vault;
         // ctx.accounts.stake_vault.mint_nfts = vec![]; 
-        vault.nft_a_edition = vec![];
-        vault.nft_a_mint = vec![];
-        vault.user_pubkey = vec![];
+        vault.edition_nft = vec![];
+        vault.mint_nfts = vec![];
+        vault.users_pubkey = vec![];
 
-        vault.nft_a_mint.push(ctx.accounts.nft_a_mint);
-        vault.nft_a_edition.push(ctx.accounts.nft_a_edition);
-        vault.users_pubkey.push(ctx.accounts.user);
-
+        vault.mint_nfts.push(ctx.accounts.nft_a_mint.key());
+        vault.edition_nft.push(ctx.accounts.nft_a_edition.key());
+        vault.users_pubkey.push(ctx.accounts.user.key());
 
         ////////////////////////////////////////////////////////////////////////////////////
 
@@ -145,13 +144,29 @@ pub mod stake {
         )?;
         msg!("2- FREEZED AUTRHORITY OF NFT_A FROM USER TO PROGRAM. ");
 
-        ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
-        ctx.accounts.stake_vault.user_pubkey = ctx.accounts.user.key();
-        ctx.accounts.stake_vault.stake_state = StakeState::Staked;
-        ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
-        ctx.accounts.stake_vault.is_initialize = true;
+        let vault = &mut ctx.accounts.stake_vault;
+        // ctx.accounts.stake_vault.mint_nfts = vec![]; 
+        vault.edition_nft = vec![];
+        vault.mint_nfts = vec![];
+        vault.users_pubkey = vec![];
+        vault.token_account_a = vec![];
+
+        vault.mint_nfts.push(ctx.accounts.nft_a_mint.key());
+        vault.edition_nft.push(ctx.accounts.nft_a_edition.key());
+        vault.users_pubkey.push(ctx.accounts.user.key());
+        vault.token_account_a.push(ctx.accounts.nft_a_token_account.key());
 
         // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
+
+        //wanted nft from user is nft_b and if it's exist in mint_nfts array:
+
+        // if in [mint_nfts] exist nft_b mint then:
+
+        // retrieve nft_b_mint in [mint_nfts]
+        // retrieve nft_b_token_account in [token_account]
+        // retrieve nft_b_edition in [edition_nft]
+        
+        
 
         msg!("SECOND SCENARIO - PHASE 2");
         // let nft_b: Pubkey = ctx.accounts.stake_vault.,  
@@ -235,7 +250,7 @@ pub struct Stake<'info> {
         bump,
         payer = user,
         space = 8 + StakeVault::INIT_SPACE)]
-    pub stake_vault: Account<'info, StakeVault>,
+    pub stake_vault: Box<Account<'info, StakeVault>>,
     /// CHECK: Manual validation
     #[account(mut , seeds= ["authority".as_bytes().as_ref()] , bump)]
     pub program_authority: UncheckedAccount<'info>,
@@ -267,13 +282,14 @@ pub struct Stake<'info> {
 #[account]
 #[derive(InitSpace)]
 pub struct StakeVault {
-    pub users_pubkey: Pubkey,
-    pub token_account_a: Pubkey,
+    pub users_pubkey: Vec<Pubkey>,
+    pub token_account_a: Vec<Pubkey>,
     // pub token_account_b: Pubkey,
     pub stake_start: u64,
     pub is_initialize: bool,
     pub stake_state: StakeState,
-    pub mint_nfts: Pubkey,
+    pub mint_nfts: Vec<Pubkey>,
+    pub edition_nft: Vec<Pubkey>,
 }
 
 #[derive(PartialEq, AnchorSerialize, AnchorDeserialize, Clone, Copy, InitSpace)]
