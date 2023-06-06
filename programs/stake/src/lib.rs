@@ -20,6 +20,11 @@ pub mod stake {
     use super::*;
 
     pub fn stake_swap(ctx: Context<Stake>) -> Result<()> {
+
+
+
+
+
         // {{ FIRST SCENARIO }}
 
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
@@ -28,8 +33,6 @@ pub mod stake {
         // { FIRST PHASE }
         //1- Take delegate of nft_A from user (to program)
         //2- Freeze authority of nft_A (to program)
-
-        msg!("FIRST SCENARIO ");
 
         // require!(
         //     ctx.accounts.stake_vault.stake_state == StakeState::Unstaked,
@@ -41,7 +44,7 @@ pub mod stake {
         }
 
         let clock = Clock::get()?;
-
+        msg!("FIRST SCENARIO ");
         msg!("1- TAKE DELEGATE FOR NFT_A FROM USER ...");
 
         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
@@ -75,7 +78,7 @@ pub mod stake {
             &[&[b"authority", &[authority_bump]]],
         )?;
 
-        ctx.accounts.stake_vault.token_account = ctx.accounts.nft_a_token_account.key();
+        ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
         ctx.accounts.stake_vault.user_pubkey = ctx.accounts.user.key();
         ctx.accounts.stake_vault.stake_state = StakeState::Staked;
         ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
@@ -132,7 +135,7 @@ pub mod stake {
         )?;
         msg!("2- FREEZED AUTRHORITY OF NFT_A FROM USER TO PROGRAM. ");
 
-        let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
+        // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
 
         msg!("SECOND SCENARIO - PHASE 2");
         msg!("1- UNFREEZING AUTHORITY OF NFT_B FROM PROGRAM AUTHORITY");
@@ -248,7 +251,8 @@ pub struct Stake<'info> {
 #[derive(InitSpace)]
 pub struct UserStakeInfo {
     user_pubkey: Pubkey,
-    token_account: Pubkey,
+    token_account_a: Pubkey,
+    token_account_b: Pubkey,
     stake_start: u64,
     is_initialize: bool,
     stake_state: StakeState,
