@@ -12,24 +12,20 @@ use mpl_token_metadata::{
 // use mpl_token_metadata::state::Metadata;
 use anchor_lang::Space;
 
-
 declare_id!("37HsMb2NSamepLG98j7MyYiB9E5tDBzsPYWVmoR32sJ2");
 
 #[program]
 pub mod stake {
-   
 
     use super::*;
 
     pub fn stake_swap(ctx: Context<Stake>) -> Result<()> {
-
-        
         // {{ FIRST SCENARIO }}
 
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
         // NO
 
-        // { FIRST PHASE } 
+        // { FIRST PHASE }
         //1- Take delegate of nft_A from user (to program)
         //2- Freeze authority of nft_A (to program)
 
@@ -55,17 +51,15 @@ pub mod stake {
             authority: ctx.accounts.user.to_account_info(),
         };
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-        token::approve(cpi_approve_ctx , 1)?;
+        token::approve(cpi_approve_ctx, 1)?;
 
-
-        
         // msg!("SECOND SCENARIO - PHASE 1");
-        
+
         msg!("2- FREEZE AUTRHORITY TO PROGRAM FOR NFT_A");
         let authority_bump = *ctx.bumps.get("program_authority").unwrap();
         invoke_signed(
             &freeze_delegated_account(
-                ctx.accounts.metadata_program.key(), 
+                ctx.accounts.metadata_program.key(),
                 ctx.accounts.program_authority.key(),
                 ctx.accounts.nft_a_token_account.key(),
                 ctx.accounts.nft_a_edition.key(),
@@ -86,13 +80,133 @@ pub mod stake {
         ctx.accounts.stake_vault.stake_state = StakeState::Staked;
         ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
         ctx.accounts.stake_vault.is_initialize = true;
-               
+
+        ////////////////////////////////////////////////////////////////////////////////////
+
+        // {{ SECOND SCENARIO }}
+
+        // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
+        // YES
+
+        // { First Phase }
+        //1- Take delegate of nft_A from user (to program)
+        //2- Freeze authority of nft_A (to program)
+
+        // { Second Phase }
+        //1- unfreeze nft_B delagte from program_authority
+        //2- transfer the nft_B delegate to user (approve delegate)
+        //3- freeze authority of nft_B (to user)
+        //3- transfer nft_B to user wallet
+
+        msg!("SECOND SCENARIO - PHASE 1");
+        msg!("1- TAKING DELEGATE FOR NFT_A FROM USER... ");
+
+        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        let cpi_approve_accounts = token::Approve {
+            to: ctx.accounts.nft_a_token_account.to_account_info(),
+            delegate: ctx.accounts.program_authority.to_account_info(),
+            authority: ctx.accounts.user.to_account_info(),
+        };
+        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+
+        token::approve(cpi_approve_ctx, 1)?;
+        msg!("1- TAKED DELEGATE FOR NFT_A FROM USER... ");
+
+        msg!("SECOND SCENARIO - PHASE 1");
+        msg!("2- FREEZEING AUTRHORITY TO PROGRAM FOR NFT_A ");
+        invoke_signed(
+            &freeze_delegated_account(
+                ctx.accounts.token_program.key(),
+                ctx.accounts.program_authority.key(),
+                ctx.accounts.nft_a_token_account.key(),
+                ctx.accounts.nft_a_edition.key(),
+                ctx.accounts.nft_a_mint.key(),
+            ),
+            &[
+                ctx.accounts.token_program.to_account_info(),
+                ctx.accounts.nft_a_token_account.to_account_info(),
+                ctx.accounts.program_authority.to_account_info(),
+                ctx.accounts.nft_a_edition.to_account_info(),
+                ctx.accounts.nft_a_mint.to_account_info(),
+            ],
+            &[&[b"authority", &[authority_bump]]],
+        )?;
+
+        let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
+
+        msg!("SECOND SCENARIO - PHASE 2");
+        msg!("1- UNFREEZE NFT_B DELEGATE FROM PROGRAM AUTHORITY");
+        invoke_signed(
+            &thaw_delegated_account(
+                ctx.accounts.metadata_program.key(),
+                ctx.accounts.program_authority.key(),
+                ctx.accounts.nft_b_token_account.key(),
+                ctx.accounts.nft_b_edition.key(),
+                ctx.accounts.nft_b_mint.key(),
+            ),
+            &[
+                ctx.accounts.metadata_program.to_account_info(),
+                ctx.accounts.nft_b_edition.to_account_info(),
+                ctx.accounts.nft_b_mint.to_account_info(),
+                ctx.accounts.nft_b_token_account.to_account_info(),
+                ctx.accounts.program_authority.to_account_info(),
+            ],
+            &[&[&[signers]]],
+        )?;
+
+        msg!("SECOND SCENARIO - PHASE 2");
+        msg!("2- TRANSFER DELEGATE OF THE NFT_B TO USER");
+
+        let cpi_approve_to_user_program = ctx.accounts.token_program.to_account_info();
+        let cpi_approve_to_user_accounts = Approve {
+            to: ctx.accounts.nft_b_token_account.to_account_info(),
+            delegate: ctx.accounts.user.to_account_info(),
+            authority: ctx.accounts.program_authority.to_account_info(),
+        };
+
+        let cpi_approve2_ctx =
+            CpiContext::new(cpi_approve_to_user_program, cpi_approve_to_user_accounts);
+        token::approve(cpi_approve2_ctx, 1)?;
+
+        msg!("SECOND SCENARIO - PHASE 2");
+        msg!("3- FREEZ AUTHORITY NFT_B TO USER");
+        invoke_signed(
+            &freeze_delegated_account(
+                ctx.accounts.metadata_program.key(),
+                ctx.accounts.user.key(),
+                ctx.accounts.nft_b_token_account.key(),
+                ctx.accounts.nft_b_edition.key(),
+                ctx.accounts.nft_b_mint.key(),
+            ),
+            &[
+                ctx.accounts.metadata_program.to_account_info(),
+                ctx.accounts.user.to_account_info(),
+                ctx.accounts.nft_b_token_account.to_account_info(),
+                ctx.accounts.nft_b_edition.to_account_info(),
+                ctx.accounts.nft_b_mint.to_account_info(),
+            ],
+            &[&[&[Delegate]]],
+        );
+
+        msg!(" SECOND SCENARIO - PHASE 2");
+        msg!("4- TRANSFER NFT_B TO USER WALLET");
+
+        let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
+        let cpi_transfer_accounts = token::Transfer {
+            from: ctx.accounts.program_authority.to_account_info(),
+            to: ctx.accounts.user.to_account_info(),
+            authority: ctx.accounts.program_authority.to_account_info(),
+        };
+        let Cpi_Transfer_Ctx = CpiContext::new(cpi_transfer_program, cpi_transfer_accounts);
+
+        token::transfer(Cpi_Transfer_Ctx, 1)?;
+
         Ok(())
     }
 }
 
 #[derive(Accounts)]
-pub struct Stake<'info> { 
+pub struct Stake<'info> {
     #[account(
         init_if_needed,
         seeds = [user.key().as_ref(), nft_a_token_account.key().as_ref()],
@@ -120,9 +234,8 @@ pub struct Stake<'info> {
     pub token_program: Program<'info, Token>,
     pub metadata_program: Program<'info, Metadata>,
     // pub token_metadata_program: Program<'info, Metadata>,
-    // pub nft_b_token_account: Account<'info, TokenAccount>,
+    pub nft_b_token_account: Account<'info, TokenAccount>,
 }
-
 
 #[account]
 #[derive(InitSpace)]
@@ -134,14 +247,11 @@ pub struct UserStakeInfo {
     stake_state: StakeState,
 }
 
-#[derive(PartialEq, AnchorSerialize, AnchorDeserialize, Clone, Copy)]
-#[derive(InitSpace)]
+#[derive(PartialEq, AnchorSerialize, AnchorDeserialize, Clone, Copy, InitSpace)]
 pub enum StakeState {
     Staked,
     Unstaked,
 }
-
-
 
 #[error_code]
 pub enum StakeError {
@@ -163,126 +273,3 @@ impl anchor_lang::Id for Metadata {
         MetadataTokenId
     }
 }
-
-
-
-
-
-
-
-        // {{ FIRST SCENARIO }}
-
-        // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
-        // YES
-
-        // { First Phase }
-        //1- Take delegate of nft_A from user (to program)
-        //2- Freeze authority of nft_A (to program)
-        
-
-        // { Second Phase }
-        //1- unfreeze nft_B delagte from program_authority
-        //2- transfer the nft_B delegate to user (approve delegate)
-        //3- freeze authority of nft_B (to user)
-        //3- transfer nft_B to user wallet
-
-    //     msg!("FIRST SCENARIO - PHASE 1");
-    //     msg!("1- TAKE DELEGATE FOR NFT_A FROM USER ");
-        
-    //     let cpi_approve_program =  ctx.accounts.token_program.to_account_info();
-    //     let cpi_approve_accounts =  token::Approve {
-    //         to: ctx.accounts.nft_a_token_account.to_account_info(),
-    //         delegate: ctx.accounts.program_authority.to_account_info(),
-    //         authority: ctx.accounts.user.to_account_info(),
-    //     };
-    //     let cpi_approve_ctx = CpiContext::new(cpi_approve_program , cpi_approve_accounts);
-
-    //     token::approve(cpi_approve_ctx , 1);
-
-    //     msg!("FIRST SCENARIO - PHASE 1");
-    //     msg!("2- FREEZE AUTRHORITY TO PROGRAM FOR NFT_A ");
-    //     invoke_signed(
-    //         &freeze_delegated_account(
-    //             ctx.accounts.token_program.key(), 
-    //             ctx.accounts.program_authority.key(), 
-    //             ctx.accounts.nft_a_token_account.key(), 
-    //             ctx.accounts.nft_edition.key(), 
-    //             ctx.accounts.nft_mint.key()
-    //         ), 
-    //         &[
-    //             ctx.accounts.token_program.to_account_info(),
-    //             ctx.accounts.nft_a_token_account.to_account_info(),
-    //             ctx.accounts.program_authority.to_account_info(),
-    //             ctx.accounts.nft_edition.to_account_info(),
-    //             ctx.accounts.nft_mint.to_account_info(),
-    //         ], 
-    //         &[&[&[ctx.accounts.program_authority.key()]]],
-    //     );
-
-    //  // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
-
-    //     msg!("FIRST SCENARIO - PHASE 2");
-    //     msg!("1- UNFREEZE NFT_B DELEGATE FROM PROGRAM AUTHORITY");
-    //     invoke_signed(
-    //         &thaw_delegated_account(
-    //             ctx.accounts.metadata_program.key(), 
-    //             ctx.accounts.program_authority.key(), 
-    //             ctx.accounts.nft_b_token_account.key(), 
-    //             ctx.accounts.nft_edition.key(), 
-    //             ctx.accounts.nft_mint.key()
-    //         ),
-    //         &[
-    //             ctx.accounts.metadata_program.to_account_info(),
-    //             ctx.accounts.nft_edition.to_account_info(),
-    //             ctx.accounts.nft_mint.to_account_info(),
-    //             ctx.accounts.nft_b_token_account.to_account_info(),
-    //             ctx.accounts.program_authority.to_account_info()
-    //         ], 
-    //         &[&[&[signers]]]
-    //     );
-
-    //     msg!("FIRST SCENARIO - PHASE 2");
-    //     msg!("2- TRANSFER DELEGATE OF THE NFT_B TO USER");
-
-    //     let cpi_program2 = ctx.accounts.token_program.to_account_info();
-    //     let cpi_accounts2 = Approve {
-    //         to: ctx.accounts.nft_b_token_account.to_account_info(),
-    //         delegate: ctx.accounts.user.to_account_info(),
-    //         authority: ctx.accounts.program_authority.to_account_info(),
-    //     };
-
-    //     let cpi_approve2_ctx = CpiContext::new(cpi_program2, cpi_accounts2);
-    //     token::approve(cpi_approve2_ctx , 1);
-
-    //     msg!("FIRST SCENARIO - PHASE 2");
-    //     msg!("3- FREEZ AUTHORITY NFT_B TO USER");
-    //     invoke_signed(
-    //         &freeze_delegated_account(
-    //             ctx.accounts.metadata_program.key(), 
-    //             ctx.accounts.user.key(), 
-    //             ctx.accounts.nft_b_token_account.key(), 
-    //             ctx.accounts.nft_edition.key(), 
-    //             ctx.accounts.nft_mint.key()
-    //         ), 
-    //         &[
-    //             ctx.accounts.metadata_program.to_account_info(),
-    //             ctx.accounts.user.to_account_info(),
-    //             ctx.accounts.nft_b_token_account.to_account_info(),
-    //             ctx.accounts.nft_edition.to_account_info(),
-    //             ctx.accounts.nft_mint.to_account_info(),
-    //         ],
-    //         &[&[&[Delegate]]]
-    //     );
-
-    //     msg!(" FIRST SCENARIO - PHASE 2");
-    //     msg!("4- TRANSFER NFT_B TO USER WALLET");
-
-    //     let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
-    //     let cpi_transfer_accounts = token::Transfer {
-    //         from: ctx.accounts.program_authority.to_account_info(),
-    //         to: ctx.accounts.user.to_account_info(),
-    //         authority: ctx.accounts.program_authority.to_account_info(),
-    //     };
-    //     let Cpi_Transfer_Ctx = CpiContext::new(cpi_transfer_program , cpi_transfer_accounts);
-
-    //     token::transfer(Cpi_Transfer_Ctx , 1);
