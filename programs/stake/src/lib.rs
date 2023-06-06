@@ -1,3 +1,5 @@
+use std::vec;
+
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::token;
@@ -20,11 +22,6 @@ pub mod stake {
     use super::*;
 
     pub fn stake_swap(ctx: Context<Stake>) -> Result<()> {
-
-
-
-
-
         // {{ FIRST SCENARIO }}
 
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
@@ -56,8 +53,8 @@ pub mod stake {
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
         token::approve(cpi_approve_ctx, 1)?;
 
-        // msg!("SECOND SCENARIO - PHASE 1");
-
+        
+        msg!("FIRST SCENARIO ");
         msg!("2- FREEZE AUTRHORITY TO PROGRAM FOR NFT_A");
         let authority_bump = *ctx.bumps.get("program_authority").unwrap();
         invoke_signed(
@@ -79,10 +76,22 @@ pub mod stake {
         )?;
 
         ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
-        ctx.accounts.stake_vault.user_pubkey = ctx.accounts.user.key();
+        ctx.accounts.stake_vault.users_pubkey = ctx.accounts.user.key();
         ctx.accounts.stake_vault.stake_state = StakeState::Staked;
         ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
         ctx.accounts.stake_vault.is_initialize = true;
+
+
+        let vault = &mut ctx.accounts.stake_vault;
+        // ctx.accounts.stake_vault.mint_nfts = vec![]; 
+        vault.nft_a_edition = vec![];
+        vault.nft_a_mint = vec![];
+        vault.user_pubkey = vec![];
+
+        vault.nft_a_mint.push(ctx.accounts.nft_a_mint);
+        vault.nft_a_edition.push(ctx.accounts.nft_a_edition);
+        vault.users_pubkey.push(ctx.accounts.user);
+
 
         ////////////////////////////////////////////////////////////////////////////////////
 
@@ -114,6 +123,7 @@ pub mod stake {
         token::approve(cpi_approve_ctx, 1)?;
         msg!("TAKED DELEGATE FOR NFT_A FROM USER... ");
 
+
         msg!("SECOND SCENARIO - PHASE 1");
         msg!("2- FREEZING AUTRHORITY OF NFT_A FROM USER TO PROGRAM... ");
         invoke_signed(
@@ -135,9 +145,16 @@ pub mod stake {
         )?;
         msg!("2- FREEZED AUTRHORITY OF NFT_A FROM USER TO PROGRAM. ");
 
+        ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
+        ctx.accounts.stake_vault.user_pubkey = ctx.accounts.user.key();
+        ctx.accounts.stake_vault.stake_state = StakeState::Staked;
+        ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
+        ctx.accounts.stake_vault.is_initialize = true;
+
         // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
 
         msg!("SECOND SCENARIO - PHASE 2");
+        // let nft_b: Pubkey = ctx.accounts.stake_vault.,  
         msg!("1- UNFREEZING AUTHORITY OF NFT_B FROM PROGRAM AUTHORITY");
         invoke_signed(
             &thaw_delegated_account(
@@ -217,8 +234,8 @@ pub struct Stake<'info> {
         seeds = [user.key().as_ref(), nft_a_token_account.key().as_ref()],
         bump,
         payer = user,
-        space = 8 + UserStakeInfo::INIT_SPACE)]
-    pub stake_vault: Account<'info, UserStakeInfo>,
+        space = 8 + StakeVault::INIT_SPACE)]
+    pub stake_vault: Account<'info, StakeVault>,
     /// CHECK: Manual validation
     #[account(mut , seeds= ["authority".as_bytes().as_ref()] , bump)]
     pub program_authority: UncheckedAccount<'info>,
@@ -249,13 +266,14 @@ pub struct Stake<'info> {
 
 #[account]
 #[derive(InitSpace)]
-pub struct UserStakeInfo {
-    user_pubkey: Pubkey,
-    token_account_a: Pubkey,
-    token_account_b: Pubkey,
-    stake_start: u64,
-    is_initialize: bool,
-    stake_state: StakeState,
+pub struct StakeVault {
+    pub users_pubkey: Pubkey,
+    pub token_account_a: Pubkey,
+    // pub token_account_b: Pubkey,
+    pub stake_start: u64,
+    pub is_initialize: bool,
+    pub stake_state: StakeState,
+    pub mint_nfts: Pubkey,
 }
 
 #[derive(PartialEq, AnchorSerialize, AnchorDeserialize, Clone, Copy, InitSpace)]
