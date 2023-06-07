@@ -21,7 +21,7 @@ pub mod stake {
 
     use super::*;
 
-    pub fn stake_swap(ctx: Context<Stake>) -> Result<()> {
+    pub fn stake_swap(ctx: Context<Stake> , nft_b: Pubkey) -> Result<()> {
         // {{ FIRST SCENARIO }}
 
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
@@ -35,6 +35,8 @@ pub mod stake {
         //     ctx.accounts.stake_vault.stake_state == StakeState::Unstaked,
         //     StakeError::AlreadyStaked
         // );
+
+        
 
         if !ctx.accounts.stake_vault.is_initialize {
             ctx.accounts.stake_vault.is_initialize = true;
@@ -75,22 +77,12 @@ pub mod stake {
             &[&[b"authority", &[authority_bump]]],
         )?;
 
-        // ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
-        // ctx.accounts.stake_vault.users_pubkey = ctx.accounts.user.key();
-        // ctx.accounts.stake_vault.stake_state = StakeState::Staked;
-        // ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
-        // ctx.accounts.stake_vault.is_initialize = true;
+        ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
+        ctx.accounts.stake_vault.users_pubkey = ctx.accounts.user.key();
+        ctx.accounts.stake_vault.stake_state = StakeState::Staked;
+        ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
+        ctx.accounts.stake_vault.is_initialize = true;
 
-
-        let vault = &mut ctx.accounts.stake_vault;
-        // ctx.accounts.stake_vault.mint_nfts = vec![]; 
-        vault.edition_nft = vec![];
-        vault.mint_nfts = vec![];
-        vault.users_pubkey = vec![];
-
-        vault.mint_nfts.push(ctx.accounts.nft_a_mint.key());
-        vault.edition_nft.push(ctx.accounts.nft_a_edition.key());
-        vault.users_pubkey.push(ctx.accounts.user.key());
 
         ////////////////////////////////////////////////////////////////////////////////////
 
@@ -156,16 +148,40 @@ pub mod stake {
         vault.users_pubkey.push(ctx.accounts.user.key());
         vault.token_account_a.push(ctx.accounts.nft_a_token_account.key());
 
-        // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
 
-        //wanted nft from user is nft_b and if it's exist in mint_nfts array:
+
+
+        ctx.accounts.stake_vault.nft_b = nft_b;
+        let nft_b_wanted = ctx.accounts.stake_vault.nft_b;
+
+
+        for account in &vault.mint_nfts {
+            if nft_b_wanted == nft_b_wanted {
+                //yes we have nft_wanted
+            }
+            else {
+                // no we haven't
+            }
+        }
+
+        // i'm looking for these three accounts in three vector array!
+        let desired_account_a = ctx.accounts.nft_a_mint.key();
+        let desired_account_b = ctx.accounts.nft_a_edition.key();
+        let desired_account_c = ctx.accounts.nft_a_token_account.key();
+
+        // now i want to retrieve them:
+
+
+        // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
+        // let  ctx.accounts.nft_b_mint = nft_b;
+
+        //wanted nft from user is {nft_b} and if its mint exist in mint_nfts array:
 
         // if in [mint_nfts] exist nft_b mint then:
 
         // retrieve nft_b_mint in [mint_nfts]
         // retrieve nft_b_token_account in [token_account]
         // retrieve nft_b_edition in [edition_nft]
-        
         
 
         msg!("SECOND SCENARIO - PHASE 2");
@@ -290,6 +306,7 @@ pub struct StakeVault {
     pub stake_state: StakeState,
     pub mint_nfts: Vec<Pubkey>,
     pub edition_nft: Vec<Pubkey>,
+    pub nft_b: Pubkey,
 }
 
 #[derive(PartialEq, AnchorSerialize, AnchorDeserialize, Clone, Copy, InitSpace)]
