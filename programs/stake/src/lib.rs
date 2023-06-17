@@ -113,10 +113,10 @@ pub mod stake {
 
         msg!("NFT_B's AUTHORIUTY FREEZED");
         
-        //-----
 
         ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
-        ctx.accounts.stake_vault.users_pubkey = ctx.accounts.user_a.key();
+        ctx.accounts.stake_vault.user_a_pubkey = ctx.accounts.user_a.key();
+        ctx.accounts.stake_vault.user_b_pubkey = ctx.accounts.user_b.key();
         ctx.accounts.stake_vault.stake_state = StakeState::Staked;
         ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
         ctx.accounts.stake_vault.is_initialize = true;
@@ -125,6 +125,8 @@ pub mod stake {
 
 
         // let vault = &mut ctx.accounts.stake_vault;
+
+        let _user_b = &mut ctx.accounts.user_b;
 
         // msg!("SECOND SCENARIO - PHASE 2");
         // let nft_b: Pubkey = ctx.accounts.stake_vault.,  
@@ -149,10 +151,10 @@ pub mod stake {
         msg!(" UNFREEZED AUTHORITY OF NFT_B FROM PROGRAM AUTHORITY");
 
         // msg!("SECOND SCENARIO - PHASE 2");
-        msg!("2-2 TAKING DELEGATE OF NFT_B FROM PROGRAM TO USER...");
+        msg!("2-2 TAKING DELEGATE OF NFT_B FROM PROGRAM TO USER B...");
 
         let cpi_approve_to_user_program = ctx.accounts.token_program.to_account_info();
-        let cpi_approve_to_user_accounts = Approve {
+        let cpi_approve_to_user_accounts = token::Approve {
             to: ctx.accounts.nft_b_token_account.to_account_info(),
             delegate: ctx.accounts.user_b.to_account_info(),
             authority: ctx.accounts.program_authority.to_account_info(),
@@ -160,10 +162,10 @@ pub mod stake {
         let cpi_approve2_ctx =
             CpiContext::new(cpi_approve_to_user_program, cpi_approve_to_user_accounts);
         token::approve(cpi_approve2_ctx, 1)?;
-        msg!("2- TAKED DELEGATE OF NFT_B FROM PROGRAM TO USER_B...");
+        msg!(" TAKED DELEGATE OF NFT_B FROM PROGRAM TO USER_B...");
 
 
-        msg!("SECOND SCENARIO - PHASE 2");
+        // msg!("SECOND SCENARIO - PHASE 2");
         msg!("2-3 FREEZING AUTHORITY OF NFT_B TO USER_B ...");
         invoke_signed(
             &freeze_delegated_account(
@@ -184,7 +186,7 @@ pub mod stake {
         )?;
         msg!("FREEZED AUTHORITY OF NFT_B TO USER.");
 
-        msg!(" SECOND SCENARIO - PHASE 2");
+        // msg!(" SECOND SCENARIO - PHASE 2");
         msg!("4- TRANSFERING NFT_B FROM PROGRAM TO USER WALLET ...");
 
         let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
@@ -195,7 +197,8 @@ pub mod stake {
         };
         let cpi_transfer_ctx = CpiContext::new(cpi_transfer_program, cpi_transfer_accounts);
         token::transfer(cpi_transfer_ctx, 1)?;
-        msg!(" TRANSFERED NFT_B FROM PROGRAM TO USER WALLET");
+        msg!(" TRANSFERED NFT_B FROM PROGRAM TO USER B WALLET");
+
 
         Ok(())
     }
@@ -209,12 +212,14 @@ pub struct Stake<'info> {
         bump,
         payer = user_a,
         space = 8 + StakeVault::INIT_SPACE)]
-    pub stake_vault: Account<'info, StakeVault>,
+    pub stake_vault: Box<Account<'info, StakeVault>>,
 
     /// CHECK: Manual validation
     #[account(mut , seeds= ["authority".as_bytes().as_ref()] , bump)]
     pub program_authority: UncheckedAccount<'info>,
 
+    /// CHECK: Manual validation
+    #[account(mut)]
     pub user_b: UncheckedAccount<'info>,
 
     #[account(mut)]
@@ -238,6 +243,7 @@ pub struct Stake<'info> {
     /// CHECK: We're about to create this with Metaplex
     #[account(owner=MetadataTokenId)]
     pub nft_a_edition: UncheckedAccount<'info>,
+    /// CHECK: We're about to create this with Metaplex
     #[account(owner=MetadataTokenId)]
     pub nft_b_edition: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
@@ -248,15 +254,16 @@ pub struct Stake<'info> {
 #[account]
 #[derive(InitSpace)]
 pub struct StakeVault {
-    pub users_pubkey: Pubkey,
+    pub user_a_pubkey: Pubkey,
+    pub user_b_pubkey: Pubkey,
     pub token_account_a: Pubkey,
     pub token_account_b: Pubkey,
     pub stake_start: u64,
     pub is_initialize: bool,
     pub stake_state: StakeState,
     pub mint_nfts: Pubkey,
-    pub edition_nft: Pubkey,
-    pub nft_b: Pubkey,
+    // pub edition_nft: Pubkey,
+    // pub nft_b: Pubkey,
 }
 
 #[derive(PartialEq, AnchorSerialize, AnchorDeserialize, Clone, Copy, InitSpace)]
