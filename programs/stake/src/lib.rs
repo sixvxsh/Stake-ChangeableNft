@@ -21,7 +21,7 @@ pub mod stake {
 
     use super::*;
 
-    pub fn stake_swap(ctx: Context<Stake> , nft_b: Pubkey) -> Result<()> {
+    pub fn stake_swap(ctx: Context<Stake> , nft_a: Pubkey , nft_b: Pubkey) -> Result<()> {
         // {{ FIRST SCENARIO }}
 
         // DO WE HAVE THE NFT REQUESTED FROM THE USER ?
@@ -55,6 +55,7 @@ pub mod stake {
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
         token::approve(cpi_approve_ctx, 1)?;
 
+
         
         msg!("FIRST SCENARIO ");
         msg!("2- FREEZE AUTRHORITY TO PROGRAM FOR NFT_A");
@@ -77,12 +78,58 @@ pub mod stake {
             &[&[b"authority", &[authority_bump]]],
         )?;
 
+        msg!("NFT_A AUTHORIUTY FREEZED");
+
+        
+
+        //-------
+
+        msg!("SECOND SCENARIO - PHASE 1");
+        msg!("1- TAKING DELEGATE FOR NFT_B FROM USER TO PROGRAM... ");
+
+        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        let cpi_approve_accounts = token::Approve {
+            to: ctx.accounts.nft_b_token_account.to_account_info(),
+            delegate: ctx.accounts.program_authority.to_account_info(),
+            authority: ctx.accounts.user.to_account_info(),
+        };
+        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        token::approve(cpi_approve_ctx, 1)?;
+        msg!("TAKED DELEGATE FOR NFT_B FROM USER... ");
+
+
+        msg!("SECOND SCENARIO - PHASE 1");
+        let authority_bump = *ctx.bumps.get("program_authority").unwrap();
+        msg!("2- FREEZING AUTRHORITY OF NFT_B FROM USER TO PROGRAM... ");
+        invoke_signed(
+            &freeze_delegated_account(
+                ctx.accounts.metadata_program.key(),
+                ctx.accounts.program_authority.key(),
+                ctx.accounts.nft_b_token_account.key(),
+                ctx.accounts.nft_b_edition.key(),
+                ctx.accounts.nft_b_mint.key(),
+            ),
+            &[
+                ctx.accounts.metadata_program.to_account_info(),
+                ctx.accounts.nft_b_token_account.to_account_info(),
+                ctx.accounts.program_authority.to_account_info(),
+                ctx.accounts.nft_b_edition.to_account_info(),
+                ctx.accounts.nft_b_mint.to_account_info(),
+            ],
+            &[&[b"authority", &[authority_bump]]],
+        )?;
+
+        msg!("2- FREEZED AUTRHORITY OF NFT_B FROM USER TO PROGRAM. ");
+        
+        //-----
+
         ctx.accounts.stake_vault.token_account_a = ctx.accounts.nft_a_token_account.key();
         ctx.accounts.stake_vault.users_pubkey = ctx.accounts.user.key();
         ctx.accounts.stake_vault.stake_state = StakeState::Staked;
         ctx.accounts.stake_vault.stake_start = clock.unix_timestamp as u64;
         ctx.accounts.stake_vault.is_initialize = true;
-
+        ctx.accounts.stake_vault.token_account_b = ctx.accounts.nft_b_token_account.key();
+        ctx.accounts.stake_vault.is_initialize = true;
 
         ////////////////////////////////////////////////////////////////////////////////////
 
@@ -101,88 +148,43 @@ pub mod stake {
         //3- freeze authority of nft_B (to user)
         //3- transfer nft_B to user wallet
 
-        msg!("SECOND SCENARIO - PHASE 1");
-        msg!("1- TAKING DELEGATE FOR NFT_A FROM USER TO PROGRAM... ");
+        // msg!("SECOND SCENARIO - PHASE 1");
+        // msg!("1- TAKING DELEGATE FOR NFT_A FROM USER TO PROGRAM... ");
 
-        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-        let cpi_approve_accounts = token::Approve {
-            to: ctx.accounts.nft_a_token_account.to_account_info(),
-            delegate: ctx.accounts.program_authority.to_account_info(),
-            authority: ctx.accounts.user.to_account_info(),
-        };
-        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-        token::approve(cpi_approve_ctx, 1)?;
-        msg!("TAKED DELEGATE FOR NFT_A FROM USER... ");
-
-
-        msg!("SECOND SCENARIO - PHASE 1");
-        msg!("2- FREEZING AUTRHORITY OF NFT_A FROM USER TO PROGRAM... ");
-        invoke_signed(
-            &freeze_delegated_account(
-                ctx.accounts.token_program.key(),
-                ctx.accounts.program_authority.key(),
-                ctx.accounts.nft_a_token_account.key(),
-                ctx.accounts.nft_a_edition.key(),
-                ctx.accounts.nft_a_mint.key(),
-            ),
-            &[
-                ctx.accounts.token_program.to_account_info(),
-                ctx.accounts.nft_a_token_account.to_account_info(),
-                ctx.accounts.program_authority.to_account_info(),
-                ctx.accounts.nft_a_edition.to_account_info(),
-                ctx.accounts.nft_a_mint.to_account_info(),
-            ],
-            &[&[b"authority", &[authority_bump]]],
-        )?;
-        msg!("2- FREEZED AUTRHORITY OF NFT_A FROM USER TO PROGRAM. ");
-
-        let vault = &mut ctx.accounts.stake_vault;
-        // ctx.accounts.stake_vault.mint_nfts = vec![]; 
-        vault.edition_nft = vec![];
-        vault.mint_nfts = vec![];
-        vault.users_pubkey = vec![];
-        vault.token_account_a = vec![];
-
-        vault.mint_nfts.push(ctx.accounts.nft_a_mint.key());
-        vault.edition_nft.push(ctx.accounts.nft_a_edition.key());
-        vault.users_pubkey.push(ctx.accounts.user.key());
-        vault.token_account_a.push(ctx.accounts.nft_a_token_account.key());
+        // let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        // let cpi_approve_accounts = token::Approve {
+        //     to: ctx.accounts.nft_a_token_account.to_account_info(),
+        //     delegate: ctx.accounts.program_authority.to_account_info(),
+        //     authority: ctx.accounts.user.to_account_info(),
+        // };
+        // let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        // token::approve(cpi_approve_ctx, 1)?;
+        // msg!("TAKED DELEGATE FOR NFT_A FROM USER... ");
 
 
+        // msg!("SECOND SCENARIO - PHASE 1");
+        // msg!("2- FREEZING AUTRHORITY OF NFT_A FROM USER TO PROGRAM... ");
+        // invoke_signed(
+        //     &freeze_delegated_account(
+        //         ctx.accounts.token_program.key(),
+        //         ctx.accounts.program_authority.key(),
+        //         ctx.accounts.nft_a_token_account.key(),
+        //         ctx.accounts.nft_a_edition.key(),
+        //         ctx.accounts.nft_a_mint.key(),
+        //     ),
+        //     &[
+        //         ctx.accounts.token_program.to_account_info(),
+        //         ctx.accounts.nft_a_token_account.to_account_info(),
+        //         ctx.accounts.program_authority.to_account_info(),
+        //         ctx.accounts.nft_a_edition.to_account_info(),
+        //         ctx.accounts.nft_a_mint.to_account_info(),
+        //     ],
+        //     &[&[b"authority", &[authority_bump]]],
+        // )?;
+        // msg!("2- FREEZED AUTRHORITY OF NFT_A FROM USER TO PROGRAM. ");
 
 
-        ctx.accounts.stake_vault.nft_b = nft_b;
-        let nft_b_wanted = ctx.accounts.stake_vault.nft_b;
-
-
-        for account in &vault.mint_nfts {
-            if nft_b_wanted == nft_b_wanted {
-                //yes we have nft_wanted
-            }
-            else {
-                // no we haven't
-            }
-        }
-
-        // i'm looking for these three accounts in three vector array!
-        let desired_account_a = ctx.accounts.nft_a_mint.key();
-        let desired_account_b = ctx.accounts.nft_a_edition.key();
-        let desired_account_c = ctx.accounts.nft_a_token_account.key();
-
-        // now i want to retrieve them:
-
-
-        // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
-        // let  ctx.accounts.nft_b_mint = nft_b;
-
-        //wanted nft from user is {nft_b} and if its mint exist in mint_nfts array:
-
-        // if in [mint_nfts] exist nft_b mint then:
-
-        // retrieve nft_b_mint in [mint_nfts]
-        // retrieve nft_b_token_account in [token_account]
-        // retrieve nft_b_edition in [edition_nft]
-        
+        // let vault = &mut ctx.accounts.stake_vault;
 
         msg!("SECOND SCENARIO - PHASE 2");
         // let nft_b: Pubkey = ctx.accounts.stake_vault.,  
@@ -202,7 +204,7 @@ pub mod stake {
                 ctx.accounts.nft_b_token_account.to_account_info(),
                 ctx.accounts.program_authority.to_account_info(),
             ],
-            &[&[&[signers]]],
+            &[&[b"authority", &[authority_bump]]],
         )?;
         msg!(" UNFREEZED AUTHORITY OF NFT_B FROM PROGRAM AUTHORITY");
 
@@ -219,6 +221,7 @@ pub mod stake {
             CpiContext::new(cpi_approve_to_user_program, cpi_approve_to_user_accounts);
         token::approve(cpi_approve2_ctx, 1)?;
         msg!("2- TAKED DELEGATE OF NFT_B FROM PROGRAM TO USER...");
+
 
         msg!("SECOND SCENARIO - PHASE 2");
         msg!("3- FREEZING AUTHORITY OF NFT_B TO USER ...");
@@ -237,8 +240,8 @@ pub mod stake {
                 ctx.accounts.nft_b_edition.to_account_info(),
                 ctx.accounts.nft_b_mint.to_account_info(),
             ],
-            &[&[&[Delegate]]],
-        );
+            &[&[b"authority", &[authority_bump]]],
+        )?;
         msg!("FREEZED AUTHORITY OF NFT_B TO USER.");
 
         msg!(" SECOND SCENARIO - PHASE 2");
@@ -250,8 +253,8 @@ pub mod stake {
             to: ctx.accounts.user.to_account_info(),
             authority: ctx.accounts.program_authority.to_account_info(),
         };
-        let Cpi_Transfer_Ctx = CpiContext::new(cpi_transfer_program, cpi_transfer_accounts);
-        token::transfer(Cpi_Transfer_Ctx, 1)?;
+        let cpi_transfer_ctx = CpiContext::new(cpi_transfer_program, cpi_transfer_accounts);
+        token::transfer(cpi_transfer_ctx, 1)?;
         msg!(" TRANSFERED NFT_B FROM PROGRAM TO USER WALLET");
 
         Ok(())
@@ -266,7 +269,7 @@ pub struct Stake<'info> {
         bump,
         payer = user,
         space = 8 + StakeVault::INIT_SPACE)]
-    pub stake_vault: Box<Account<'info, StakeVault>>,
+    pub stake_vault: Account<'info, StakeVault>,
     /// CHECK: Manual validation
     #[account(mut , seeds= ["authority".as_bytes().as_ref()] , bump)]
     pub program_authority: UncheckedAccount<'info>,
@@ -298,14 +301,14 @@ pub struct Stake<'info> {
 #[account]
 #[derive(InitSpace)]
 pub struct StakeVault {
-    pub users_pubkey: Vec<Pubkey>,
-    pub token_account_a: Vec<Pubkey>,
-    // pub token_account_b: Pubkey,
+    pub users_pubkey: Pubkey,
+    pub token_account_a: Pubkey,
+    pub token_account_b: Pubkey,
     pub stake_start: u64,
     pub is_initialize: bool,
     pub stake_state: StakeState,
-    pub mint_nfts: Vec<Pubkey>,
-    pub edition_nft: Vec<Pubkey>,
+    pub mint_nfts: Pubkey,
+    pub edition_nft: Pubkey,
     pub nft_b: Pubkey,
 }
 
@@ -335,3 +338,75 @@ impl anchor_lang::Id for Metadata {
         MetadataTokenId
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ctx.accounts.stake_vault.mint_nfts = vec![]; 
+        // vault.edition_nft = vec![];
+        // vault.mint_nfts = vec![];
+        // vault.users_pubkey = vec![];
+        // vault.token_account_a = vec![];
+
+        // vault.mint_nfts.push(ctx.accounts.nft_a_mint.key());
+        // vault.edition_nft.push(ctx.accounts.nft_a_edition.key());
+        // vault.users_pubkey.push(ctx.accounts.user.key());
+        // vault.token_account_a.push(ctx.accounts.nft_a_token_account.key());
+        
+
+            // let nft_b = &mut ctx.accounts.stake_vault.nft_b;
+        // // ctx.accounts.stake_vault.nft_b = nft_b;
+        // // let nft_b_wanted = ctx.accounts.stake_vault.nft_b;
+
+        // for account in &vault.mint_nfts {
+        //     if nft_b == nft_b {
+        //         //yes we have nft_wanted
+        //     }
+        //     else {
+        //         // no we haven't
+        //     }
+        // }
+
+        // i'm looking for these three accounts in three vector array!
+        // let desired_account_a = ctx.accounts.nft_a_mint.key();
+        // let desired_account_b = ctx.accounts.nft_a_edition.key();
+        // let desired_account_c = ctx.accounts.nft_a_token_account.key();
+
+        // now i want to retrieve them by index of them in their arrays:
+        // let index_a = vault.mint_nfts.iter().position(|&account| account == desired_account_a );
+        // let index_b = vault.edition_nft.iter().position(|&account| account == desired_account_b);
+        // let index_c = vault.token_account_a.iter().position(|&account| account == desired_account_c);
+
+
+        // if let Some(index_a) = index_a {
+        //     let account_a = vault.mint_nfts[index_a];
+        //     // Do something with account_a
+        // }
+
+
+
+
+
+
+        // let nft_token_account = ctx.accounts.stake_vault.nft_token_account;
+        // let  ctx.accounts.nft_b_mint = nft_b;
+
+        //wanted nft from user is {nft_b} and if its mint exist in mint_nfts array:
+
+        // if in [mint_nfts] exist nft_b mint then:
+
+        // retrieve nft_b_mint in [mint_nfts]
+        // retrieve nft_b_token_account in [token_account]
+        // retrieve nft_b_edition in [edition_nft]
