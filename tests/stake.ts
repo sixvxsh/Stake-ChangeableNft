@@ -36,6 +36,12 @@ describe("STAKE", () => {
   console.log(("===================="));
   console.log(" WALLET PUBKEY(USER 1) ---->", walletPubKey);
 
+ 
+  const mintforprogram: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+  console.log("-----------------------");
+  console.log(`MintKeyPublic ===>  ${mintforprogram.publicKey}`);
+
+
   console.log(("===================="));
   const user_b = new anchor.web3.PublicKey("GpFuzeBf6oQm98fiTr375rb8HfmgjQA2nU7CwZgG7dtC");
   console.log(" COLLECTION ---->", user_b);
@@ -87,6 +93,7 @@ describe("STAKE", () => {
 
 
 
+
   it('IT STAKE', async () => {
 
     console.log("THE BEGINING OF IT STAKE ...");
@@ -100,6 +107,23 @@ describe("STAKE", () => {
     );
     console.log(("===================="));
     console.log("DELAGATED AUTHORITY PDA ---->", delegatedAuthPda);
+
+
+
+    const AtaTreasuryAccount = anchor.utils.token.associatedAddress({
+      mint: mintforprogram.publicKey,
+      owner: delegatedAuthPda
+    });
+    console.log("-----------------------");
+    console.log(`TREASURY Token Address (ATA) ===> ${AtaTreasuryAccount}`);
+
+
+    const AtaUserB = anchor.utils.token.associatedAddress({
+      mint: Mint_b,
+      owner: user_b
+    });
+    console.log("-----------------------");
+    console.log(`USER B Token Address (ATA)  ===> ${AtaUserB}`);
 
 
     const [stakeVault] = await anchor.web3.PublicKey.findProgramAddressSync(
@@ -171,11 +195,14 @@ describe("STAKE", () => {
       let StakeIx = await program.methods
         .stakeSwap(Mint_a, Mint_b)
         .accounts({
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+          mint: mintforprogram.publicKey,
+          nftTreasuryAccount: AtaTreasuryAccount,
           userA: wallet.publicKey,
           userB: user_b,
           nftBEdition: masterEditionAddress_b,
           nftBMint: Mint_b,
-          nftBTokenAccount:TokenAddress_b ,
+          nftBTokenAccount:TokenAddress_b,
           metadataProgram: TOKEN_METADATA_PROGRAM_ID,
           nftAEdition: masterEditionAddress_a,
           nftAMint: Mint_a,
