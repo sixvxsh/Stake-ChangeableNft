@@ -36,7 +36,7 @@ describe("STAKE", () => {
   console.log(("===================="));
   console.log(" WALLET PUBKEY(USER 1) ---->", walletPubKey);
 
- 
+
   const mintforprogram: anchor.web3.Keypair = anchor.web3.Keypair.generate();
   console.log("-----------------------");
   console.log(`MintKeyPublic ===>  ${mintforprogram.publicKey}`);
@@ -91,9 +91,6 @@ describe("STAKE", () => {
   });
 
 
-
-
-
   it('IT STAKE', async () => {
 
     console.log("THE BEGINING OF IT STAKE ...");
@@ -134,7 +131,7 @@ describe("STAKE", () => {
     console.log(("===================="));
     console.log("STAKE VAULT PDA ---->", stakeVault);
 
-    //FIND PDA FOR METADATA A
+    //FIND PDA FOR METADATA NFT A
     const metadataAddress_a = anchor.web3.PublicKey.findProgramAddressSync(
       [
         Buffer.from("metadata"),
@@ -147,7 +144,7 @@ describe("STAKE", () => {
     console.log(`metadata a initialized and its address ===> ${metadataAddress_a}`);
 
 
-    //FIND PDA FOR METADATA B
+    //FIND PDA FOR METADATA NFT B
     const metadataAddress_b = anchor.web3.PublicKey.findProgramAddressSync(
       [
         Buffer.from("metadata"),
@@ -200,9 +197,10 @@ describe("STAKE", () => {
           nftTreasuryAccount: AtaTreasuryAccount,
           userA: wallet.publicKey,
           userB: user_b,
+          userBNftAccount: AtaUserB,
           nftBEdition: masterEditionAddress_b,
           nftBMint: Mint_b,
-          nftBTokenAccount:TokenAddress_b,
+          nftBTokenAccount: TokenAddress_b,
           metadataProgram: TOKEN_METADATA_PROGRAM_ID,
           nftAEdition: masterEditionAddress_a,
           nftAMint: Mint_a,
@@ -249,7 +247,7 @@ describe("STAKE", () => {
         console.log("-----------------------");
         console.log("CONFIRM TRANSACTION =====>", confirmMintTx);
 
-        
+
         const result = await provider.connection.getParsedTransaction(signature, "confirmed");
         console.log("-----------------------");
         console.log("STAKE TX RESULT =====>", result);

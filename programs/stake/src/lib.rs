@@ -3,11 +3,29 @@ use std::vec;
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::token;
-use anchor_spl::{associated_token::AssociatedToken, token::{Token, Mint, TokenAccount}};
-// use anchor_spl::token::{Approve, Mint, Token, TokenAccount};
+use anchor_spl::associated_token::AssociatedToken;
+use anchor_spl::token::{Approve, Mint, Token, TokenAccount};
 use mpl_token_metadata::{
     instruction::{freeze_delegated_account, thaw_delegated_account},
     ID as MetadataTokenId,
+};
+
+use {
+    anchor_lang::{
+        prelude::*,
+        solana_program::program::invoke,
+        system_program,
+    },
+    anchor_spl::{
+        associated_token,
+    },
+    mpl_token_metadata::{
+        ID as TOKEN_METADATA_ID,
+        instruction as token_instruction,
+    },
+    // mpl_token_metadata::instruction::
+    // {create_master_edition_v3,
+    // create_metadata_accounts_v3},
 };
 // use mpl_token_metadata::state::Metadata;
 use anchor_lang::Space;
@@ -41,7 +59,26 @@ pub mod stake {
         let _clock = Clock::get()?;
 
 
+
+        msg!("CREATING TOKEN ACCOUNT FOR USER B NFT ACCOUNT...");
+        associated_token::create(
+            CpiContext::new(
+                ctx.accounts.associated_token_program.to_account_info(), 
+                associated_token::Create {
+                    payer: ctx.accounts.user_a.to_account_info(),
+                    associated_token: ctx.accounts.user_b_nft_account.to_account_info(),
+                    authority: ctx.accounts.user_b.to_account_info(), 
+                    mint: ctx.accounts.nft_b_mint.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    token_program: ctx.accounts.token_program.to_account_info(),
+                },
+            ),
+        )?;
+
+
+
         // Transfer NFT_A from user A to program
+        msg!("TRANSFERING NFT_A...");
         let cpi_program = ctx.accounts.token_program.to_account_info();
         let cpi_accounts = token::Transfer {
             from: ctx.accounts.nft_a_token_account.to_account_info(),
@@ -50,11 +87,10 @@ pub mod stake {
         };
         let token_transfer_context = CpiContext::new(cpi_program, cpi_accounts);
         token::transfer(token_transfer_context, 1)?;
-
+        msg!("Transfered NFT_A from user A to program's treasury ");
 
         // msg!("FIRST SCENARIO ");
         msg!("1-1 TAKE DELEGATE FOR NFT_A FROM USER ...");
-
         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
         let cpi_approve_accounts = token::Approve {
             to: ctx.accounts.nft_a_token_account.to_account_info(),
@@ -97,6 +133,7 @@ pub mod stake {
         };
         let token_transfer_context = CpiContext::new(cpi_program, cpi_accounts);
         token::transfer(token_transfer_context, 1)?;
+        msg!("Transfered NFT_B from user A to program's treasury ");
 
 
         msg!("1-3 TAKING DELEGATE FOR NFT_B FROM USER TO PROGRAM... ");
@@ -212,13 +249,13 @@ pub mod stake {
         let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
         let cpi_transfer_accounts = token::Transfer {
             from: ctx.accounts.nft_treasury_account.to_account_info(),
-            to: ctx.accounts.nft_b_token_account.to_account_info(),
+            to: ctx.accounts.user_b_nft_account.to_account_info(),
             authority: ctx.accounts.program_authority.to_account_info(),
         };
         let signer: &[&[&[u8]]] = &[&[&b"authority"[..]]];
         let cpi_transfer_ctx = CpiContext::new_with_signer(cpi_transfer_program, cpi_transfer_accounts, signer );
         token::transfer(cpi_transfer_ctx, 1)?;
-        msg!(" TRANSFERED NFT_B FROM PROGRAM TO USER B WALLET");
+        msg!(" TRANSFERED NFT_B FROM PROGRAM'S TREASURY TO USER B WALLET");
 
         // let signer = [&[&b"authority"[..]]];
 
@@ -253,13 +290,6 @@ pub struct Stake<'info> {
     pub program_authority: UncheckedAccount<'info>,
 
 
-    #[account(
-        mut,
-        associated_token::mint=nft_b_mint,
-        associated_token::authority=user_b
-    )]
-    pub user_b_nft_account: Account<'info, TokenAccount>,
-
     /// CHECK: Manual validation
     #[account(mut)]
     pub user_b: AccountInfo<'info>,
@@ -269,24 +299,31 @@ pub struct Stake<'info> {
 
     #[account(
         mut,
+        associated_token::mint=nft_b_mint,
+        associated_token::authority=user_b
+    )]
+    pub user_b_nft_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
         associated_token::mint=nft_a_mint,
         associated_token::authority=user_a
     )]
-    pub nft_a_token_account: Account<'info, TokenAccount>,
+    pub nft_a_token_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint=nft_b_mint,
         associated_token::authority=user_a
     )]
-    pub nft_b_token_account: Account<'info, TokenAccount>,
+    pub nft_b_token_account: Box<Account<'info, TokenAccount>>,
     #[account(
         init_if_needed,
         payer = user_a, // If init required, payer will be user
         associated_token::mint = mint, // If init required, mint will be set to Mint
         associated_token::authority = program_authority // If init required, authority set to PDA
     )]
-    pub nft_treasury_account: Account<'info, TokenAccount>,
+    pub nft_treasury_account: Box<Account<'info, TokenAccount>>,
     pub nft_a_mint: Account<'info, Mint>,
     pub nft_b_mint: Account<'info, Mint>,
     /// CHECK: We're about to create this with Metaplex
@@ -300,7 +337,7 @@ pub struct Stake<'info> {
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub metadata_program: Program<'info, Metadata>,
-    pub mint: Account<'info, Mint>
+    pub mint: Box<Account<'info, Mint>>
 }
 
 #[account]
