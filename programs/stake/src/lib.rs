@@ -60,6 +60,7 @@ pub mod stake {
 
 
 
+
         msg!("CREATING TOKEN ACCOUNT FOR USER B NFT ACCOUNT...");
         associated_token::create(
             CpiContext::new(
@@ -78,11 +79,11 @@ pub mod stake {
 
 
         // Transfer NFT_A from user A to program
-        msg!("TRANSFERING NFT_A...");
+        msg!("TRANSFERING NFT_A FROM USER A...");
         let cpi_program = ctx.accounts.token_program.to_account_info();
         let cpi_accounts = token::Transfer {
             from: ctx.accounts.nft_a_token_account.to_account_info(),
-            to: ctx.accounts.nft_treasury_account.to_account_info(),
+            to: ctx.accounts.nft_a_treasury_account.to_account_info(),
             authority: ctx.accounts.user_a.to_account_info(),
         };
         let token_transfer_context = CpiContext::new(cpi_program, cpi_accounts);
@@ -128,12 +129,12 @@ pub mod stake {
         let cpi_program = ctx.accounts.token_program.to_account_info();
         let cpi_accounts = token::Transfer {
             from: ctx.accounts.nft_b_token_account.to_account_info(),
-            to: ctx.accounts.nft_treasury_account.to_account_info(),
+            to: ctx.accounts.nft_b_treasury_account.to_account_info(),
             authority: ctx.accounts.user_a.to_account_info(),
         };
         let token_transfer_context = CpiContext::new(cpi_program, cpi_accounts);
         token::transfer(token_transfer_context, 1)?;
-        msg!("Transfered NFT_B from user A to program's treasury ");
+        msg!("Transfered NFT_B from user B to program's treasury ");
 
 
         msg!("1-3 TAKING DELEGATE FOR NFT_B FROM USER TO PROGRAM... ");
@@ -141,11 +142,11 @@ pub mod stake {
         let cpi_approve_accounts = token::Approve {
             to: ctx.accounts.nft_b_token_account.to_account_info(),
             delegate: ctx.accounts.program_authority.to_account_info(),
-            authority: ctx.accounts.user_a.to_account_info(),
+            authority: ctx.accounts.user_b.to_account_info(),
         };
         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
         token::approve(cpi_approve_ctx, 1)?;
-        msg!("TAKED DELEGATE FOR NFT_B FROM USER ");
+        msg!("TAKED DELEGATE FOR NFT_B FROM USER B ");
 
         let authority_bump = *ctx.bumps.get("program_authority").unwrap();
         msg!("1-4 FREEZING AUTRHORITY OF NFT_B FROM USER TO PROGRAM... ");
@@ -246,9 +247,11 @@ pub mod stake {
         // // msg!(" SECOND SCENARIO - PHASE 2");
         // msg!("4- TRANSFERING NFT_B FROM PROGRAM TO USER WALLET ...");
 
+
+        msg!("TRANSFER NFT A FROM (NFT_A_TREASURY_ACCOUNT) TO USER_B_NFT ACCOUNT..");
         let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
         let cpi_transfer_accounts = token::Transfer {
-            from: ctx.accounts.nft_treasury_account.to_account_info(),
+            from: ctx.accounts.nft_a_treasury_account.to_account_info(),
             to: ctx.accounts.user_b_nft_account.to_account_info(),
             authority: ctx.accounts.program_authority.to_account_info(),
         };
@@ -256,6 +259,19 @@ pub mod stake {
         let cpi_transfer_ctx = CpiContext::new_with_signer(cpi_transfer_program, cpi_transfer_accounts, signer );
         token::transfer(cpi_transfer_ctx, 1)?;
         msg!(" TRANSFERED NFT_B FROM PROGRAM'S TREASURY TO USER B WALLET");
+
+        msg("TRANSFER NFT B FROM (NFT_B_TREASURY_ACCOUNT) TO USER_A_NFT ACCOUNT..");
+        let cpi_transfer_program = ctx.accounts.token_program.to_account_info();
+        let cpi_transfer_accounts = token::Transfer {
+            from: ctx.accounts.nft_b_treasury_account.to_account_info(),
+            to: ctx.accounts.user_a_nft_account.to_account_info(), 
+            authority: ctx.accounts.program_authority.to_account_info(),
+        };
+        let signer: &[&[&[u8]]] = &[&[&b"authority"[..]]];
+        let cpi_transfer_ctx = CpiContext::new_with_signer(cpi_transfer_program, cpi_transfer_accounts, signer );
+        token::transfer(cpi_transfer_ctx, 1)?;
+
+        
 
         // let signer = [&[&b"authority"[..]]];
 
