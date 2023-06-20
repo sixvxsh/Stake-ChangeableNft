@@ -20,6 +20,7 @@ import { TOKEN_PROGRAM_ID, createMint, getAssociatedTokenAddress } from "@solana
 
 
 
+
 describe("STAKE", () => {
 
   console.log(`
@@ -42,31 +43,43 @@ describe("STAKE", () => {
   console.log(`MintKeyPublic ===>  ${mintforprogram.publicKey}`);
 
 
-  console.log(("===================="));
-  const user_b = new anchor.web3.PublicKey("GpFuzeBf6oQm98fiTr375rb8HfmgjQA2nU7CwZgG7dtC");
-  console.log(" COLLECTION ---->", user_b);
+  const user_b_keypair = Keypair.fromSecretKey(
+    Uint8Array.from([
+      148, 220, 74, 86, 68, 72, 55, 74, 186, 215,
+      223, 48, 99, 219, 180, 164, 171, 193, 88, 243,
+      177, 43, 122, 156, 4, 162, 36, 208, 148, 118,
+      102, 186, 234, 250, 119, 2, 109, 159, 135, 132,
+      83, 102, 140, 128, 240, 204, 106, 254, 143, 207,
+      169, 205, 250, 127, 158, 204, 12, 161, 221, 26,
+      217, 245, 90, 233
+    ])
+  );
 
   console.log(("===================="));
-  const collection = new anchor.web3.PublicKey("G5WvFzffVU2vLW7Eitym5ebobmFAkXfvtqgkdi2ZJprB");
-  console.log(" COLLECTION ---->", collection);
+  const user_b = new anchor.web3.PublicKey("GpFuzeBf6oQm98fiTr375rb8HfmgjQA2nU7CwZgG7dtC");
+  // console.log(" COLLECTION ---->", user_b);
+
+  // console.log(("===================="));
+  // const collection = new anchor.web3.PublicKey("G5WvFzffVU2vLW7Eitym5ebobmFAkXfvtqgkdi2ZJprB");
+  // console.log(" COLLECTION ---->", collection);
   console.log(("===================="));
   const Mint_a = new anchor.web3.PublicKey("EYogS25ACPuV9e7cd52JudFmciwuqLfTwBbMyeHDrkGe");
   console.log(" Mint A ---->", Mint_a);
   console.log(("===================="));
-  const Mint_b = new anchor.web3.PublicKey("3d6vLfJmJAYB3kUWN5r2SiKGkifiF4abBSwo9bMVJG4b");
+  const Mint_b = new anchor.web3.PublicKey("BVwY8FYCvzeqv7Y4mmAEHuyhygDjEyJfC64fqeCpa3S7");
   console.log(" Mint B ---->", Mint_b);
   console.log(("===================="));
   const metadata_a = new anchor.web3.PublicKey("EVZ6ZiktJNt5Qr7S8QvSwsBmxM2383dHvkmUNAABECVR");
   console.log(" METADATA ---->", metadata_a);
   console.log(("===================="));
-  const metadata_b = new anchor.web3.PublicKey("BrbD1FLbQETAWg21WtTny1EPT2Grh9KLpB3m26snrDXL");
+  const metadata_b = new anchor.web3.PublicKey("ELdQDmHa9k7yKeyfXwzFrxvFnrtfX4RnrjNqqzQBhHyW");
   console.log(" METADATA ---->", metadata_b);
   console.log(("===================="));
   const TokenAddress_a = new anchor.web3.PublicKey("6R4je3NoiJvkD8h9HVnaqYfjsyNUVcnqMkVC2qhDvZyx");
-  console.log(" TOKEN ADDRESS ---->", TokenAddress_a);
+  console.log(" TOKEN ADDRESS A ---->", TokenAddress_a);
   console.log(("===================="));
-  const TokenAddress_b = new anchor.web3.PublicKey("FFv3A6ibP5um4DVgxSujPPotsCyGwiabf865r1gLNYQo");
-  console.log(" TOKEN ADDRESS ---->", TokenAddress_b);
+  const TokenAddress_b = new anchor.web3.PublicKey("5wyHzR1nC9K7FEcAL4mSg1gfGouTdK8r9HvwoxESVQMX");
+  console.log(" TOKEN ADDRESS B ---->", TokenAddress_b);
   console.log(("===================="));
   const program = anchor.workspace.Stake as Program<Stake>;
   console.log("PROGRAM", program.programId.toBase58());
@@ -96,7 +109,7 @@ describe("STAKE", () => {
     console.log("THE BEGINING OF IT STAKE ...");
 
 
-    const [delegatedAuthPda] = await anchor.web3.PublicKey.findProgramAddressSync(
+    const [delegatedAuthPda, _] = await anchor.web3.PublicKey.findProgramAddressSync(
       [
         Buffer.from("authority")
       ],
@@ -107,27 +120,44 @@ describe("STAKE", () => {
 
 
 
-    const AtaTreasuryAccount = anchor.utils.token.associatedAddress({
-      mint: mintforprogram.publicKey,
+    // const AtaTreasuryAccount = anchor.utils.token.associatedAddress({
+    //   mint: mintforprogram.publicKey,
+    //   owner: delegatedAuthPda
+    // });
+    // console.log("-----------------------");
+    // console.log(`TREASURY Token Address (ATA) ===> ${AtaTreasuryAccount}`);
+
+
+
+
+    const treasury_a = anchor.utils.token.associatedAddress({
+      mint: Mint_a,
       owner: delegatedAuthPda
     });
     console.log("-----------------------");
-    console.log(`TREASURY Token Address (ATA) ===> ${AtaTreasuryAccount}`);
+    console.log(`TREASURY A Token Address (ATA) ===> ${treasury_a}`);
 
 
-    const AtaUserB = anchor.utils.token.associatedAddress({
+    const treasury_b = anchor.utils.token.associatedAddress({
       mint: Mint_b,
-      owner: user_b
+      owner: delegatedAuthPda
     });
     console.log("-----------------------");
-    console.log(`USER B Token Address (ATA)  ===> ${AtaUserB}`);
+    console.log(`TREASURY B Token Address (ATA) ===> ${treasury_b}`);
 
 
-    const [stakeVault] = await anchor.web3.PublicKey.findProgramAddressSync(
-      [wallet.publicKey.toBuffer(),
-      TokenAddress_a.toBuffer()],
+    // const AtaUserB = anchor.utils.token.associatedAddress({
+    //   mint: Mint_b,
+    //   owner: user_b
+    // });
+    // console.log("-----------------------");
+    // console.log(`USER B Token Address (ATA)  ===> ${AtaUserB}`);
+
+    const [stakeVault, __] = await anchor.web3.PublicKey.findProgramAddressSync(
+      [wallet.publicKey.toBuffer(), TokenAddress_a.toBuffer()],
       program.programId
     );
+    
     console.log(("===================="));
     console.log("STAKE VAULT PDA ---->", stakeVault);
 
@@ -193,11 +223,13 @@ describe("STAKE", () => {
         .stakeSwap(Mint_a, Mint_b)
         .accounts({
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-          mint: mintforprogram.publicKey,
-          nftTreasuryAccount: AtaTreasuryAccount,
+          // mint: mintforprogram.publicKey,
+          // nftTreasuryAccount: AtaTreasuryAccount,
           userA: wallet.publicKey,
+          nftATreasuryAccount: treasury_a,
+          nftBTreasuryAccount: treasury_b,
           userB: user_b,
-          userBNftAccount: AtaUserB,
+          // userBNftAccount: AtaUserB,
           nftBEdition: masterEditionAddress_b,
           nftBMint: Mint_b,
           nftBTokenAccount: TokenAddress_b,
@@ -210,7 +242,7 @@ describe("STAKE", () => {
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
-        .signers([wallet.payer])
+        .signers([wallet.payer, user_b_keypair])
         .instruction()
 
       const StakeTx = new Transaction()
