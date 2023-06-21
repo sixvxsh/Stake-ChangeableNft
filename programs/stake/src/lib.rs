@@ -201,7 +201,7 @@ pub mod stake {
     pub fn swap(ctx: Context<Swap>) -> Result<()> {
 
 
-        let authority_bump = *ctx.bumps.get("swap_authority").unwrap();
+        let authority_bump = *ctx.bumps.get("stake_swap_authority").unwrap();
  
         let seeds = &[
             b"authority".as_ref(),
@@ -348,6 +348,7 @@ pub struct Stake<'info> {
 #[derive(Accounts)]
 pub struct Swap<'info> {
 
+    /// CHECK: Manual validation
     #[account(mut)]
     pub user_a: AccountInfo<'info>,
 
@@ -363,7 +364,7 @@ pub struct Swap<'info> {
     nft_a_mint.key().as_ref(),
     nft_b_mint.key().as_ref()
     ],
-    bump)]
+    bump )]
     pub stake_swap_authority: Account<'info , PdaVault>,
 
     #[account(
@@ -381,14 +382,16 @@ pub struct Swap<'info> {
     pub nft_b_treasury_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = stake_swap_authority,
         associated_token::mint = nft_a_mint,
         associated_token::authority = user_b
     )]
     pub nft_a_swap_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = stake_swap_authority,
         associated_token::mint = nft_b_mint,
         associated_token::authority = user_a
     )]

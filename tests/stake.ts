@@ -84,10 +84,10 @@ describe("STAKE", () => {
 
 
   const token_address_for_swap_a = new anchor.web3.PublicKey("RjCUrw7qMA2BpryVCLVrvhAX4zAPzbZkAtVeK56AHGq");
-  console.log(" TOKEN ADDRESS FOR SWAP A ---->", TokenAddress_a);
+  console.log(" TOKEN ADDRESS FOR SWAP A ---->", token_address_for_swap_a);
   console.log(("===================="));
-  const token_address_for_swap_b = new anchor.web3.PublicKey("5wyHzR1nC9K7FEcAL4mSg1gfGouTdK8r9HvwoxESVQMX");
-  console.log(" TOKEN ADDRESS FOR SWAP B ---->", TokenAddress_b);
+  const token_address_for_swap_b = new anchor.web3.PublicKey("DxuibrUj66MhxBNKBeJQ2mohghngcXqut8yN4Cktekbf");
+  console.log(" TOKEN ADDRESS FOR SWAP B ---->", token_address_for_swap_b);
   console.log(("===================="));
 
 
@@ -95,7 +95,7 @@ describe("STAKE", () => {
   console.log("PROGRAM", program.programId.toBase58());
 
 
-  const [auhority_pda, authority] = anchor.web3.PublicKey.findProgramAddressSync(
+  const [StakeSwapAuth, _] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("authority"),
       wallet.publicKey.toBuffer(),
@@ -104,18 +104,15 @@ describe("STAKE", () => {
     ],
     program.programId
   );
-  // const authorityPdaSigner = anchor.web3.Keypair.fromSecretKey(
-  //   auhority_pda
-  // );
 
   console.log(("===================="));
-  console.log("AUTHORITY PDA ---->", auhority_pda);
+  console.log("AUTHORITY PDA ---->", StakeSwapAuth);
 
 
 
   const treasury_a = anchor.utils.token.associatedAddress({
     mint: mint_a,
-    owner: auhority_pda
+    owner: StakeSwapAuth
   });
   console.log("-----------------------");
   console.log(`TREASURY A Token Address (ATA) ===> ${treasury_a}`);
@@ -124,7 +121,7 @@ describe("STAKE", () => {
 
   const treasury_b = anchor.utils.token.associatedAddress({
     mint: mint_b,
-    owner: auhority_pda
+    owner: StakeSwapAuth
   });
   console.log("-----------------------");
   console.log(`TREASURY B Token Address (ATA) ===> ${treasury_b}`);
@@ -306,17 +303,17 @@ describe("STAKE", () => {
       let SwapIx = await program.methods
         .swap()
         .accounts({
+          nftASwapAccount: token_address_for_swap_a,
+          nftBSwapAccount: token_address_for_swap_b,
+          stakeSwapAuthority: StakeSwapAuth ,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
           userA: wallet.publicKey,
           nftATreasuryAccount: treasury_a,
           nftBTreasuryAccount: treasury_b,
           userB: user_b,
           nftBMint: mint_b,
-          nftBTokenAccount: TokenAddress_b,
-          metadataProgram: TOKEN_METADATA_PROGRAM_ID,
           nftAMint: mint_a,
-          nftATokenAccount: TokenAddress_a,
-          pdaAuthority: auhority_pda,
+          metadataProgram: TOKEN_METADATA_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
