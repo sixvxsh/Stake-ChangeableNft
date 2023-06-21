@@ -287,7 +287,7 @@ describe("STAKE", () => {
 
 
   it("IT SWAP", async () => {
-
+    console.log("THE BEGINING OF IT SWAP ...");
     try {
       let SwapIx = await program.methods
         .swap()
@@ -314,7 +314,7 @@ describe("STAKE", () => {
         .add(modifyComputeUnits)
         .add(SwapIx)
       console.log("====================");
-      console.log("INSTRUCTIONS ADDED TO STAKE TX");
+      console.log("INSTRUCTIONS ADDED TO SWAP TX");
 
       const blockhashData = await BLOCKHASH();
       const { blockhash, lastValidBlockHeight } = blockhashData;
@@ -331,7 +331,7 @@ describe("STAKE", () => {
 
         const signature = await sendAndConfirmTransaction(provider.connection, StakeTx, [wallet.payer]);
         console.log("-----------------------");
-        console.log("SEND AND CONFIRM STAKE TRANSACTION SIGNATURE =====>", signature);
+        console.log("SEND AND CONFIRM SWAP TRANSACTION SIGNATURE =====>", signature);
 
 
         const confirmMintTx = await program.provider.connection.confirmTransaction({
@@ -345,14 +345,14 @@ describe("STAKE", () => {
 
         const result = await provider.connection.getParsedTransaction(signature, "confirmed");
         console.log("-----------------------");
-        console.log("STAKE TX RESULT =====>", result);
+        console.log("SWAP TX RESULT =====>", result);
       } catch (Error) {
-        console.log("ERROR IN STAKE TRY TX");
+        console.log("ERROR IN SWAP TRY TX");
         console.error(Error);
       }
 
     } catch (Error) {
-      console.log(`STAKE ERROR IN BIG PICTURE OF STAKE ${Error}`);
+      console.log(`SWAP ERROR IN BIG TRY-CATCH OF SWAP ${Error}`);
       console.error(Error)
     }
 
