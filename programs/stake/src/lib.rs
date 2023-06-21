@@ -66,6 +66,17 @@ pub mod stake {
         // msg!("FIRST SCENARIO ");
         msg!("1-2 FREEZEING AUTRHORITY TO PROGRAM FOR NFT_A");
         let authority_bump = *ctx.bumps.get("pda_authority").unwrap();
+
+        let seeds = &[
+            b"stake_info".as_ref(),
+            &ctx.accounts.user_a.key().to_bytes(),
+            &ctx.accounts.nft_a_mint.key().to_bytes(),
+            &ctx.accounts.nft_b_mint.key().to_bytes(),
+            &[authority_bump],
+        ];
+
+        let signer = &[&seeds[..]];
+
         invoke_signed(
             &freeze_delegated_account(
                 ctx.accounts.metadata_program.key(),
@@ -81,7 +92,7 @@ pub mod stake {
                 ctx.accounts.nft_a_edition.to_account_info(),
                 ctx.accounts.metadata_program.to_account_info(),
             ],
-            &[&[b"authority", &[authority_bump]]],
+            signer,
         )?;
         msg!("NFT_A'S AUTHORIUTY FREEZED");
 
@@ -97,7 +108,7 @@ pub mod stake {
             to: ctx.accounts.nft_a_treasury_account.to_account_info(),
             authority: ctx.accounts.pda_authority.to_account_info(),
         };
-        let signer: &[&[&[u8]]] = &[&[&b"authority"[..]]];
+        // let signer: &[&[&[u8]]] = &[&[&b"authority"[..]]];
 
         let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
         token::transfer(token_transfer_context, 1)?;
@@ -117,7 +128,7 @@ pub mod stake {
         msg!("TAKED DELEGATE FOR NFT_B FROM USER B ");
 
 
-        let authority_bump = *ctx.bumps.get("program_authority").unwrap();
+        // let authority_bump = *ctx.bumps.get("program_authority").unwrap();
         msg!("1-4 FREEZING AUTRHORITY OF NFT_B FROM USER TO PROGRAM... ");
         invoke_signed(
             &freeze_delegated_account(
@@ -134,7 +145,7 @@ pub mod stake {
                 ctx.accounts.nft_b_edition.to_account_info(),
                 ctx.accounts.nft_b_mint.to_account_info(),
             ],
-            &[&[b"authority", &[authority_bump]]],
+            signer
         )?;
         msg!("NFT_B'S AUTHORIUTY FREEZED");
 
@@ -152,7 +163,7 @@ pub mod stake {
              to: ctx.accounts.nft_b_treasury_account.to_account_info(),
              authority: ctx.accounts.pda_authority.to_account_info(),
          };
-         let signer: &[&[&[u8]]] = &[&[&b"authority"[..]]];
+        //  let signer: &[&[&[u8]]] = &[&[&b"authority"[..]]];
 
          let token_transfer_context = CpiContext::new_with_signer(cpi2_program, cpi2_accounts, signer);
 
@@ -247,7 +258,7 @@ pub struct Stake<'info> {
 
     /// CHECK: Manual validation
     #[account(
-        init ,
+        init_if_needed,
         seeds = [b"authority",
         user_a.key().as_ref() ,
         nft_a_mint.key().as_ref(),
@@ -642,3 +653,8 @@ impl anchor_lang::Id for Metadata {
         //     },
         // ))?;
         // msg!("ASSOCIATED B CREATED");
+
+
+
+        // let signer: &[&[&[u8]]] = &[&[&b"authority"[..]]];
+        // &[&[b"authority", &[authority_bump]]],
