@@ -51,7 +51,7 @@ pub mod stake {
 
         // let _clock = Clock::get()?;
 
-        let authority_bump = *ctx.bumps.get("pda_authority").unwrap();
+        let authority_bump = *ctx.bumps.get("stake_swap_authority").unwrap();
  
         let seeds = &[
             b"authority".as_ref(),
@@ -239,7 +239,7 @@ pub mod stake {
             CpiContext::new_with_signer(cpi3_transfer_program, cpi3_transfer_accounts, signer);
 
         token::transfer(cpi_transfer_ctx, 1)?;
-        msg!(" TRANSFERED NFT_A FROM PROGRAM'S TREASURY TO USER B WALLET");
+        msg!(" TRANSFERED NFT_A FROM NFT_A_TREASURY_ACCOUNT TO USER B WALLET");
 
         /////////////////////////////////////////////
 
@@ -283,7 +283,7 @@ pub struct Stake<'info> {
     /// CHECK: Manual validation
     #[account(
         init_if_needed,
-        seeds = [b"authority",
+        seeds = ["authority".as_bytes().as_ref(),
         user_a.key().as_ref() ,
         nft_a_mint.key().as_ref(),
         nft_b_mint.key().as_ref()
@@ -355,16 +355,14 @@ pub struct Swap<'info> {
     /// CHECK: Manual validation
     #[account(mut)]
     pub user_b: AccountInfo<'info>,
-
+ 
     /// CHECK: Manual validation
-    #[account(
-    mut,
-    seeds = [b"authority",
-    user_a.key().as_ref() ,
-    nft_a_mint.key().as_ref(),
-    nft_b_mint.key().as_ref()
-    ],
-    bump )]
+    #[account(mut, seeds = [
+        "authority".as_bytes().as_ref(),
+        user_a.key().as_ref(),
+        nft_a_mint.key().as_ref(),
+        nft_b_mint.key().as_ref()
+    ], bump)]
     pub stake_swap_authority: Account<'info , PdaVault>,
 
     #[account(
@@ -384,16 +382,16 @@ pub struct Swap<'info> {
     #[account(
         init_if_needed,
         payer = stake_swap_authority,
-        associated_token::mint = nft_a_mint,
-        associated_token::authority = user_b
+        associated_token::mint = nft_b_mint,
+        associated_token::authority = user_a
     )]
     pub nft_a_swap_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
         payer = stake_swap_authority,
-        associated_token::mint = nft_b_mint,
-        associated_token::authority = user_a
+        associated_token::mint = nft_a_mint,
+        associated_token::authority = user_b
     )]
     pub nft_b_swap_account: Box<Account<'info, TokenAccount>>,
 
