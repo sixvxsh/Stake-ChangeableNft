@@ -293,6 +293,18 @@ pub struct Stake<'info> {
         space = 8 + PdaVault::INIT_SPACE)]
     pub stake_swap_authority: Account<'info , PdaVault>,
 
+
+    /// CHECK: Manual validation
+    #[account(
+        init_if_needed,
+        seeds = ["treasury".as_bytes().as_ref(),
+        user_a.key().as_ref(),
+        ],
+        bump ,
+        payer = user_a, 
+        space = 40 )]
+    pub treasury_owner: AccountInfo<'info>,
+
     /// CHECK: Manual validation
     #[account(mut)]
     pub user_b: Signer<'info>,
@@ -316,17 +328,17 @@ pub struct Stake<'info> {
 
     #[account(
         init_if_needed,
-        payer = user_a, // If init required, payer will be user
+        payer = treasury_owner, // If init required, payer will be user
         associated_token::mint = nft_a_mint, // If init required, mint will be set to Mint
-        associated_token::authority = stake_swap_authority // If init required, authority set to PDA
+        associated_token::authority = treasury_owner // If init required, authority set to PDA
     )]
     pub nft_a_treasury_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
-        payer = user_a, // If init required, payer will be user
+        payer = treasury_owner, // If init required, payer will be user
         associated_token::mint = nft_b_mint, // If init required, mint will be set to Mint
-        associated_token::authority = stake_swap_authority // If init required, authority set to PDA
+        associated_token::authority = treasury_owner // If init required, authority set to PDA
     )]
     pub nft_b_treasury_account: Box<Account<'info, TokenAccount>>,
     pub nft_a_mint: Account<'info, Mint>,
@@ -365,23 +377,35 @@ pub struct Swap<'info> {
     ], bump)]
     pub stake_swap_authority: Account<'info , PdaVault>,
 
+
+    /// CHECK: Manual validation
+    #[account(
+        init_if_needed,
+        seeds = ["treasury".as_bytes().as_ref(),
+        user_a.key().as_ref(),
+        ],
+        bump ,
+        payer = user_a, 
+        space = 40 )]
+    pub treasury_owner: AccountInfo<'info>,
+
     #[account(
         mut,
         associated_token::mint = nft_a_mint, // If init required, mint will be set to Mint
-        associated_token::authority = stake_swap_authority,// If init required, authority set to PDA
+        associated_token::authority = treasury_owner,// If init required, authority set to PDA
     )]
     pub nft_a_treasury_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = nft_b_mint, // If init required, mint will be set to Mint
-        associated_token::authority = stake_swap_authority, // If init required, authority set to PDA
+        associated_token::authority = treasury_owner, // If init required, authority set to PDA
     )]
     pub nft_b_treasury_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
-        payer = stake_swap_authority,
+        payer = treasury_owner,
         associated_token::mint = nft_b_mint,
         associated_token::authority = user_a
     )]
@@ -389,7 +413,7 @@ pub struct Swap<'info> {
 
     #[account(
         init_if_needed,
-        payer = stake_swap_authority,
+        payer = treasury_owner,
         associated_token::mint = nft_a_mint,
         associated_token::authority = user_b
     )]
