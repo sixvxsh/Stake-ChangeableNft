@@ -108,10 +108,11 @@ describe("STAKE-SWAP", () => {
   // );
 
 
-  const [StakeSwapAuth, authority ] = anchor.web3.PublicKey.findProgramAddressSync(
+  const [StakeSwapAuth , _ ] = anchor.web3.PublicKey.findProgramAddressSync(
     [
+      // anchor.utils.bytes.utf8.encode("authority"),
       Buffer.from("authority"),
-      walletPubKey.toBuffer(),
+      provider.wallet.publicKey.toBuffer(),
       mint_a.toBuffer(),
       mint_b.toBuffer(),
     ],
@@ -320,7 +321,7 @@ describe("STAKE-SWAP", () => {
           nftBSwapAccount: token_address_for_swap_b,
           stakeSwapAuthority: StakeSwapAuth,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-          userA: wallet.publicKey,
+          userA: provider.wallet.publicKey,
           nftATreasuryAccount: treasury_a,
           nftBTreasuryAccount: treasury_b,
           userB: user_b,
@@ -330,7 +331,7 @@ describe("STAKE-SWAP", () => {
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
-        .signers([ wallet.payer , user_b_keypair ])
+        // .signers([ wallet.payer , user_b_keypair ])
         .instruction()
 
       const SwapTx = new Transaction()

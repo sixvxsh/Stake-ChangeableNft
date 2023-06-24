@@ -198,7 +198,15 @@ pub mod stake {
     }
 
 
-    pub fn swap(ctx: Context<Swap>) -> Result<()> {
+    pub fn swap(ctx: Context<Swap> ) -> Result<()> {
+
+        // let stake_swap_authority = &mut ctx.accounts.stake_swap_authority;
+        // stake_swap_authority.bump = *ctx.bumps.get("stake_swap_authority").unwrap();
+
+        // stake_swap_authority.bump = *ctx.bumps.get("stake_swap_authority").unwrap();
+
+        let authority_bump = *ctx.bumps.get("stake_swap_authority").unwrap();
+        msg!("Authority bump: {}" , authority_bump );
 
 
         let authority_bump = *ctx.bumps.get("stake_swap_authority").unwrap();
@@ -213,11 +221,20 @@ pub mod stake {
 
         let signer = &[&seeds[..]];
 
+        msg!("stake_swap_authority_bump {}" , ctx.accounts.stake_swap_authority.bump );
+        
 
         /////////////////////////////////////////////
         
+        let nft_a_swap_account = &mut ctx.accounts.nft_a_swap_account;
+        msg!("nft_a_swap_account: {}", nft_a_swap_account.key());
+
+        let nft_b_swap_account = &mut ctx.accounts.nft_b_swap_account;
+        msg!("nft_b_swap_account: {}", nft_b_swap_account.key());
+
+
+
         msg!("nft_a_treasury_account: {}", &ctx.accounts.nft_a_treasury_account.key());
-        msg!("nft_b_token_account: {}", &ctx.accounts.nft_b_swap_account.key());
         msg!("authority for transfer: {}", &ctx.accounts.stake_swap_authority.key());
 
         // if account.owner != program_id {
@@ -283,7 +300,7 @@ pub struct Stake<'info> {
         init,
         payer = user_a, 
         space = 8 + PdaVault::INIT_SPACE,
-        seeds = ["authority".as_bytes().as_ref(),
+        seeds = [b"authority".as_ref(),
         user_a.key().as_ref() ,
         nft_a_mint.key().as_ref(),
         nft_b_mint.key().as_ref()],
@@ -363,17 +380,18 @@ pub struct Swap<'info> {
     #[account(mut)]
     pub user_b: AccountInfo<'info>,
  
-   /// CHECK: Manual validation
+
+    /// CHECK: Manual validation
     #[account(
         mut,
-        seeds = [
-        "authority".as_bytes().as_ref(),
-        user_a.key().as_ref(),
+        seeds = ["authority".as_bytes().as_ref(),
+        user_a.key().as_ref() ,
         nft_a_mint.key().as_ref(),
         nft_b_mint.key().as_ref()],
-        bump = stake_swap_authority.bump
-    )]
-    pub stake_swap_authority: Account<'info, PdaVault>,
+        // bump = stake_swap_authority.bump,
+        bump
+        )]
+    pub stake_swap_authority: Account<'info , PdaVault>,
 
 
     #[account(
@@ -441,7 +459,8 @@ pub struct StakeVault {
 #[account]
 #[derive(InitSpace)]
 pub struct PdaVault {
-    bump: u8
+    pub bump: u8 ,
+    // pub authority: Pubkey
 }
 
 #[derive(PartialEq, AnchorSerialize, AnchorDeserialize, Clone, Copy, InitSpace)]
