@@ -63,10 +63,10 @@ describe("STAKE-SWAP", () => {
   // const collection = new anchor.web3.PublicKey("G5WvFzffVU2vLW7Eitym5ebobmFAkXfvtqgkdi2ZJprB");
   // console.log(" COLLECTION ---->", collection);
   console.log(("===================="));
-  const mint_a = new anchor.web3.PublicKey("3pHPKetaGLq5fEE5qxgypHzhCfu5peYb8MNizURsZxLv");
+  const mint_a = new anchor.web3.PublicKey("4gZngEue4qNcndHJSStM31krTyhNjcfvDXpS4ctC6MWp");
   console.log(" Mint A ---->", mint_a);
   console.log(("===================="));
-  const mint_b = new anchor.web3.PublicKey("2UrKvKZqKMsVMAmXn6YxGbjikeL6hoQKLjyfVYrY3vUC");
+  const mint_b = new anchor.web3.PublicKey("2iHwYFE3GG5VsxLbdL1zGHLcXMws1TCUkg94YyA6Jcxf");
   console.log(" Mint B ---->", mint_b);
   console.log(("===================="));
   // const metadata_a = new anchor.web3.PublicKey("EVZ6ZiktJNt5Qr7S8QvSwsBmxM2383dHvkmUNAABECVR");
@@ -75,18 +75,18 @@ describe("STAKE-SWAP", () => {
   // const metadata_b = new anchor.web3.PublicKey("ELdQDmHa9k7yKeyfXwzFrxvFnrtfX4RnrjNqqzQBhHyW");
   // console.log(" METADATA ---->", metadata_b);
   // console.log(("===================="));
-  const TokenAddress_a = new anchor.web3.PublicKey("AYYxpr2hZzktgy49iZLeHnDZKXUyZYyppMM9hehjr47g");
+  const TokenAddress_a = new anchor.web3.PublicKey("C2HJ8aiHiQ69jbbfVmtG82Dn5b4LpQzr6Xsz9v2B5bWG");
   console.log(" TOKEN ADDRESS A ---->", TokenAddress_a);
   console.log(("===================="));
-  const TokenAddress_b = new anchor.web3.PublicKey("FGA8vz5a85HkLHiY19nMoXUax8tbeTYgjGJAkSKibxWA");
+  const TokenAddress_b = new anchor.web3.PublicKey("CVsxkZq7WWMrQiwZzRDcHHTFrANYGLgvjPjSCkQmuwX6");
   console.log(" TOKEN ADDRESS B ---->", TokenAddress_b);
   console.log(("===================="));
 
 
-  const token_address_for_swap_a = new anchor.web3.PublicKey("6sSopWqv2nPtUbyHcNo2oHCPFNbxHQ2w8UNQDpn3CqS7");
+  const token_address_for_swap_a = new anchor.web3.PublicKey("Brhjb7xNEKVpa87aNfe4bXE1cfGizqKSgL6ZccS8CmKj");
   console.log(" TOKEN ADDRESS FOR SWAP A ---->", token_address_for_swap_a);
   console.log(("===================="));
-  const token_address_for_swap_b = new anchor.web3.PublicKey("82ViwDoFQj5jcFHzxVZdaTTKimJkMP61XKZFT52qrWW1");
+  const token_address_for_swap_b = new anchor.web3.PublicKey("EQhRnLe8DvPdsxP9xVHdU8JY17uqKwcwtkXof271xgGa");
   console.log(" TOKEN ADDRESS FOR SWAP B ---->", token_address_for_swap_b);
   console.log(("===================="));
 
@@ -94,12 +94,12 @@ describe("STAKE-SWAP", () => {
   const program = anchor.workspace.Stake as Program<Stake>;
   console.log("PROGRAM ADDRESS", program.programId.toBase58());
 
-  const stakeswapSeeds = [
-    provider.wallet.publicKey.toBuffer(),
-    Buffer.from(anchor.utils.bytes.utf8.encode("authority")),
-    mint_a.toBuffer(),
-    mint_b.toBuffer(),
-  ];
+  // const stakeswapSeeds = [
+  //   provider.wallet.publicKey.toBuffer(),
+  //   Buffer.from(anchor.utils.bytes.utf8.encode("authority")),
+  //   mint_a.toBuffer(),
+  //   mint_b.toBuffer(),
+  // ];
 
 
   // const [StakeSwapAuth, _] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -108,7 +108,7 @@ describe("STAKE-SWAP", () => {
   // );
 
 
-  const [StakeSwapAuth, _ ] = anchor.web3.PublicKey.findProgramAddressSync(
+  const [StakeSwapAuth, authority ] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("authority"),
       walletPubKey.toBuffer(),
@@ -330,7 +330,7 @@ describe("STAKE-SWAP", () => {
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
-        // .signers([ wallet.payer , user_b_keypair ])
+        .signers([ wallet.payer , user_b_keypair ])
         .instruction()
 
       const SwapTx = new Transaction()
