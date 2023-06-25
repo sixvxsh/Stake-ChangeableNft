@@ -16,6 +16,7 @@ import {
   Metaplex,
 } from "@metaplex-foundation/js"
 import { TOKEN_PROGRAM_ID, createMint, getAssociatedTokenAddress } from "@solana/spl-token"
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
 
 
@@ -43,16 +44,22 @@ describe("STAKE-SWAP", () => {
   console.log(`MintKeyPublic ===>  ${mintforprogram.publicKey}`);
 
 
+  // const user_b_keypair = Keypair.fromSecretKey(
+  //   Uint8Array.from([
+  //     148, 220, 74, 86, 68, 72, 55, 74, 186, 215,
+  //     223, 48, 99, 219, 180, 164, 171, 193, 88, 243,
+  //     177, 43, 122, 156, 4, 162, 36, 208, 148, 118,
+  //     102, 186, 234, 250, 119, 2, 109, 159, 135, 132,
+  //     83, 102, 140, 128, 240, 204, 106, 254, 143, 207,
+  //     169, 205, 250, 127, 158, 204, 12, 161, 221, 26,
+  //     217, 245, 90, 233
+  //   ])
+  // );
+
   const user_b_keypair = Keypair.fromSecretKey(
-    Uint8Array.from([
-      148, 220, 74, 86, 68, 72, 55, 74, 186, 215,
-      223, 48, 99, 219, 180, 164, 171, 193, 88, 243,
-      177, 43, 122, 156, 4, 162, 36, 208, 148, 118,
-      102, 186, 234, 250, 119, 2, 109, 159, 135, 132,
-      83, 102, 140, 128, 240, 204, 106, 254, 143, 207,
-      169, 205, 250, 127, 158, 204, 12, 161, 221, 26,
-      217, 245, 90, 233
-    ])
+    bs58.decode(
+      "3ycw215tSDyHFbcm6s22RdH2si8YBXGjuRtrGArdCyGUaKAiv3dq2zWFuwVvTnMbvG1S9MB62QumdimJpGp2EBSY"
+    )
   );
 
   console.log(("===================="));
@@ -108,7 +115,7 @@ describe("STAKE-SWAP", () => {
   // );
 
 
-  const [StakeSwapAuth , _ ] = anchor.web3.PublicKey.findProgramAddressSync(
+  const [StakeSwapAuth , authority ] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       // anchor.utils.bytes.utf8.encode("authority"),
       Buffer.from("authority"),
@@ -139,6 +146,23 @@ describe("STAKE-SWAP", () => {
   });
   console.log("-----------------------");
   console.log(`TREASURY B Token Address (ATA) ===> ${treasury_b}`);
+
+
+
+  const swap_a = anchor.utils.token.associatedAddress({
+    mint: mint_b,
+    owner: walletPubKey
+  });
+  console.log("-----------------------");
+  console.log(`TREASURY B Token Address (ATA) ===> ${swap_a}`);
+
+
+  const swap_b = anchor.utils.token.associatedAddress({
+    mint: mint_a,
+    owner: user_b_keypair.publicKey
+  });
+  console.log("-----------------------");
+  console.log(`TREASURY B Token Address (ATA) ===> ${swap_b}`);
 
 
 
@@ -317,8 +341,8 @@ describe("STAKE-SWAP", () => {
       let SwapIx = await program.methods
         .swap()
         .accounts({
-          nftASwapAccount: token_address_for_swap_a,
-          nftBSwapAccount: token_address_for_swap_b,
+          nftASwapAccount: swap_a,
+          nftBSwapAccount: swap_b,
           stakeSwapAuthority: StakeSwapAuth,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
           userA: provider.wallet.publicKey,
@@ -331,7 +355,7 @@ describe("STAKE-SWAP", () => {
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
-        // .signers([ wallet.payer , user_b_keypair ])
+        .signers([ wallet.payer , user_b_keypair ])
         .instruction()
 
       const SwapTx = new Transaction()

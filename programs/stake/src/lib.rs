@@ -199,7 +199,7 @@ pub mod stake {
 
 
     pub fn swap(ctx: Context<Swap> ) -> Result<()> {
-
+        msg!("BEGINING OF SWAP IX");
         // let stake_swap_authority = &mut ctx.accounts.stake_swap_authority;
         // stake_swap_authority.bump = *ctx.bumps.get("stake_swap_authority").unwrap();
 
@@ -374,11 +374,11 @@ pub struct Swap<'info> {
 
     /// CHECK: Manual validation
     #[account(mut)]
-    pub user_a: AccountInfo<'info>,
+    pub user_a: Signer<'info>,
 
     /// CHECK: Manual validation
     #[account(mut)]
-    pub user_b: AccountInfo<'info>,
+    pub user_b: Signer<'info>,
  
 
     /// CHECK: Manual validation
@@ -414,7 +414,7 @@ pub struct Swap<'info> {
 
     #[account(
         init,
-        payer = stake_swap_authority,
+        payer = user_a,
         associated_token::mint = nft_b_mint,
         associated_token::authority = user_a
         // token::mint = nft_b_mint,
@@ -424,13 +424,14 @@ pub struct Swap<'info> {
 
     #[account(
         init,
-        payer = stake_swap_authority,
+        payer = user_b,
         associated_token::mint = nft_a_mint,
         associated_token::authority = user_b
         // token::mint = nft_a_mint,
         // token::authority = user_b
     )]
     pub nft_b_swap_account: Box<Account<'info, TokenAccount>>,
+
 
     pub nft_a_mint: Account<'info, Mint>,
     pub nft_b_mint: Account<'info, Mint>,
