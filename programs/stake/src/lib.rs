@@ -28,6 +28,9 @@ pub mod stake {
 
     use super::*;
 
+
+    pub fn createauthority
+
     pub fn stake(ctx: Context<Stake>, _nft_a: Pubkey, _nft_b: Pubkey) -> Result<()> {
 
 
@@ -105,276 +108,281 @@ pub mod stake {
         msg!("Transfered NFT_A from user A to program's treasury");
 
 
+        ctx.accounts.stake_swap_authority.token_account_a = ctx.accounts.nft_a_token_account.key();
+
+        msg!("SAVED NFT A TOKEN ACCOUNT IN PROPERTY OF STAKE SWAP");
+
+
 
 
 
         ////////////////////////////////////////
 
-        msg!("NFT B");
+        // msg!("NFT B");
 
-        // msg!("1-1 TAKE DELEGATE FOR NFT_A FROM USER ...");
-        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-        let cpi_approve_accounts = token::Approve {
-            to: ctx.accounts.nft_b_token_account.to_account_info(),
-            delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-            authority: ctx.accounts.user_a.to_account_info(),
-        };
-        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-        token::approve(cpi_approve_ctx, 1)?;
-        // msg!("1-1 TAKED DELEGATE FOR NFT_A");
-
-
-        // Transfer NFT_A from user A to program
-        msg!("nft_a_token_account: {}", &ctx.accounts.nft_a_token_account.key());
-        msg!("nft_a_treasury_account: {}", &ctx.accounts.nft_a_treasury_account.key());
-        msg!("authority for transfer: {}", &ctx.accounts.stake_swap_authority.key());
-
-        // msg!("TRANSFERING NFT_A FROM USER A...");
-        let cpi1_program = ctx.accounts.token_program.to_account_info();
-        let cpi1_accounts = token::Transfer {
-            from: ctx.accounts.nft_b_token_account.to_account_info(),
-            to: ctx.accounts.nft_b_treasury_account.to_account_info(),
-            authority: ctx.accounts.stake_swap_authority.to_account_info(),
-        };
-
-        let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
-
-        token::transfer(token_transfer_context, 1)?;
-
-        msg!("Transfered NFT_A from user A to program's treasury");
+        // // msg!("1-1 TAKE DELEGATE FOR NFT_A FROM USER ...");
+        // let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        // let cpi_approve_accounts = token::Approve {
+        //     to: ctx.accounts.nft_b_token_account.to_account_info(),
+        //     delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //     authority: ctx.accounts.user_a.to_account_info(),
+        // };
+        // let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        // token::approve(cpi_approve_ctx, 1)?;
+        // // msg!("1-1 TAKED DELEGATE FOR NFT_A");
 
 
+        // // Transfer NFT_A from user A to program
+        // msg!("nft_a_token_account: {}", &ctx.accounts.nft_a_token_account.key());
+        // msg!("nft_a_treasury_account: {}", &ctx.accounts.nft_a_treasury_account.key());
+        // msg!("authority for transfer: {}", &ctx.accounts.stake_swap_authority.key());
 
-        //////////////////////////////////////////////
+        // // msg!("TRANSFERING NFT_A FROM USER A...");
+        // let cpi1_program = ctx.accounts.token_program.to_account_info();
+        // let cpi1_accounts = token::Transfer {
+        //     from: ctx.accounts.nft_b_token_account.to_account_info(),
+        //     to: ctx.accounts.nft_b_treasury_account.to_account_info(),
+        //     authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        // };
 
-        msg!("NFT C");
+        // let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
 
-       
-        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-        let cpi_approve_accounts = token::Approve {
-            to: ctx.accounts.nft_c_token_account.to_account_info(),
-            delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-            authority: ctx.accounts.user_a.to_account_info(),
-        };
-        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-        token::approve(cpi_approve_ctx, 1)?;
-        
+        // token::transfer(token_transfer_context, 1)?;
 
-
-        let cpi1_program = ctx.accounts.token_program.to_account_info();
-        let cpi1_accounts = token::Transfer {
-            from: ctx.accounts.nft_c_token_account.to_account_info(),
-            to: ctx.accounts.nft_c_treasury_account.to_account_info(),
-            authority: ctx.accounts.stake_swap_authority.to_account_info(),
-        };
-
-        let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
-
-        token::transfer(token_transfer_context, 1)?;
-
-
+        // msg!("Transfered NFT_A from user A to program's treasury");
 
 
 
         //////////////////////////////////////////////
 
-        msg!("NFT D");
+        // msg!("NFT C");
 
        
-        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-        let cpi_approve_accounts = token::Approve {
-            to: ctx.accounts.nft_d_token_account.to_account_info(),
-            delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-            authority: ctx.accounts.user_a.to_account_info(),
-        };
-        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-        token::approve(cpi_approve_ctx, 1)?;
+        // let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        // let cpi_approve_accounts = token::Approve {
+        //     to: ctx.accounts.nft_c_token_account.to_account_info(),
+        //     delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //     authority: ctx.accounts.user_a.to_account_info(),
+        // };
+        // let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        // token::approve(cpi_approve_ctx, 1)?;
         
 
 
-        let cpi1_program = ctx.accounts.token_program.to_account_info();
-        let cpi1_accounts = token::Transfer {
-            from: ctx.accounts.nft_d_token_account.to_account_info(),
-            to: ctx.accounts.nft_d_treasury_account.to_account_info(),
-            authority: ctx.accounts.stake_swap_authority.to_account_info(),
-        };
+        // let cpi1_program = ctx.accounts.token_program.to_account_info();
+        // let cpi1_accounts = token::Transfer {
+        //     from: ctx.accounts.nft_c_token_account.to_account_info(),
+        //     to: ctx.accounts.nft_c_treasury_account.to_account_info(),
+        //     authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        // };
 
-        let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
+        // let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
 
-        token::transfer(token_transfer_context, 1)?;
-
-
+        // token::transfer(token_transfer_context, 1)?;
 
 
-         //////////////////////////////////////////////
 
-         msg!("NFT E");
+
+
+        // //////////////////////////////////////////////
+
+        // msg!("NFT D");
 
        
-         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-         let cpi_approve_accounts = token::Approve {
-             to: ctx.accounts.nft_e_token_account.to_account_info(),
-             delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-             authority: ctx.accounts.user_a.to_account_info(),
-         };
-         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-         token::approve(cpi_approve_ctx, 1)?;
+        // let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        // let cpi_approve_accounts = token::Approve {
+        //     to: ctx.accounts.nft_d_token_account.to_account_info(),
+        //     delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //     authority: ctx.accounts.user_a.to_account_info(),
+        // };
+        // let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        // token::approve(cpi_approve_ctx, 1)?;
+        
+
+
+        // let cpi1_program = ctx.accounts.token_program.to_account_info();
+        // let cpi1_accounts = token::Transfer {
+        //     from: ctx.accounts.nft_d_token_account.to_account_info(),
+        //     to: ctx.accounts.nft_d_treasury_account.to_account_info(),
+        //     authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        // };
+
+        // let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
+
+        // token::transfer(token_transfer_context, 1)?;
+
+
+
+
+        //  //////////////////////////////////////////////
+
+        //  msg!("NFT E");
+
+       
+        //  let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        //  let cpi_approve_accounts = token::Approve {
+        //      to: ctx.accounts.nft_e_token_account.to_account_info(),
+        //      delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //      authority: ctx.accounts.user_a.to_account_info(),
+        //  };
+        //  let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        //  token::approve(cpi_approve_ctx, 1)?;
          
  
  
-         let cpi1_program = ctx.accounts.token_program.to_account_info();
-         let cpi1_accounts = token::Transfer {
-             from: ctx.accounts.nft_e_token_account.to_account_info(),
-             to: ctx.accounts.nft_e_treasury_account.to_account_info(),
-             authority: ctx.accounts.stake_swap_authority.to_account_info(),
-         };
+        //  let cpi1_program = ctx.accounts.token_program.to_account_info();
+        //  let cpi1_accounts = token::Transfer {
+        //      from: ctx.accounts.nft_e_token_account.to_account_info(),
+        //      to: ctx.accounts.nft_e_treasury_account.to_account_info(),
+        //      authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        //  };
  
-         let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
+        //  let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
  
-         token::transfer(token_transfer_context, 1)?;
+        //  token::transfer(token_transfer_context, 1)?;
  
  
 
-          //////////////////////////////////////////////
+        //   //////////////////////////////////////////////
 
-        msg!("NFT F");
+        // msg!("NFT F");
 
        
-        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-        let cpi_approve_accounts = token::Approve {
-            to: ctx.accounts.nft_f_token_account.to_account_info(),
-            delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-            authority: ctx.accounts.user_a.to_account_info(),
-        };
-        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-        token::approve(cpi_approve_ctx, 1)?;
+        // let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        // let cpi_approve_accounts = token::Approve {
+        //     to: ctx.accounts.nft_f_token_account.to_account_info(),
+        //     delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //     authority: ctx.accounts.user_a.to_account_info(),
+        // };
+        // let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        // token::approve(cpi_approve_ctx, 1)?;
         
 
 
-        let cpi1_program = ctx.accounts.token_program.to_account_info();
-        let cpi1_accounts = token::Transfer {
-            from: ctx.accounts.nft_f_token_account.to_account_info(),
-            to: ctx.accounts.nft_f_treasury_account.to_account_info(),
-            authority: ctx.accounts.stake_swap_authority.to_account_info(),
-        };
+        // let cpi1_program = ctx.accounts.token_program.to_account_info();
+        // let cpi1_accounts = token::Transfer {
+        //     from: ctx.accounts.nft_f_token_account.to_account_info(),
+        //     to: ctx.accounts.nft_f_treasury_account.to_account_info(),
+        //     authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        // };
 
-        let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
+        // let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
 
-        token::transfer(token_transfer_context, 1)?;
+        // token::transfer(token_transfer_context, 1)?;
 
 
 
-         //////////////////////////////////////////////
+        //  //////////////////////////////////////////////
 
-         msg!("NFT G");
+        //  msg!("NFT G");
 
        
-         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-         let cpi_approve_accounts = token::Approve {
-             to: ctx.accounts.nft_g_token_account.to_account_info(),
-             delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-             authority: ctx.accounts.user_a.to_account_info(),
-         };
-         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-         token::approve(cpi_approve_ctx, 1)?;
+        //  let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        //  let cpi_approve_accounts = token::Approve {
+        //      to: ctx.accounts.nft_g_token_account.to_account_info(),
+        //      delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //      authority: ctx.accounts.user_a.to_account_info(),
+        //  };
+        //  let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        //  token::approve(cpi_approve_ctx, 1)?;
          
  
  
-         let cpi1_program = ctx.accounts.token_program.to_account_info();
-         let cpi1_accounts = token::Transfer {
-             from: ctx.accounts.nft_g_token_account.to_account_info(),
-             to: ctx.accounts.nft_g_treasury_account.to_account_info(),
-             authority: ctx.accounts.stake_swap_authority.to_account_info(),
-         };
+        //  let cpi1_program = ctx.accounts.token_program.to_account_info();
+        //  let cpi1_accounts = token::Transfer {
+        //      from: ctx.accounts.nft_g_token_account.to_account_info(),
+        //      to: ctx.accounts.nft_g_treasury_account.to_account_info(),
+        //      authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        //  };
  
-         let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
+        //  let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
  
-         token::transfer(token_transfer_context, 1)?;
+        //  token::transfer(token_transfer_context, 1)?;
  
  
-          //////////////////////////////////////////////
+        //   //////////////////////////////////////////////
 
-        msg!("NFT H");
+        // msg!("NFT H");
 
        
-        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-        let cpi_approve_accounts = token::Approve {
-            to: ctx.accounts.nft_h_token_account.to_account_info(),
-            delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-            authority: ctx.accounts.user_a.to_account_info(),
-        };
-        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-        token::approve(cpi_approve_ctx, 1)?;
+        // let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        // let cpi_approve_accounts = token::Approve {
+        //     to: ctx.accounts.nft_h_token_account.to_account_info(),
+        //     delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //     authority: ctx.accounts.user_a.to_account_info(),
+        // };
+        // let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        // token::approve(cpi_approve_ctx, 1)?;
         
 
 
-        let cpi1_program = ctx.accounts.token_program.to_account_info();
-        let cpi1_accounts = token::Transfer {
-            from: ctx.accounts.nft_h_token_account.to_account_info(),
-            to: ctx.accounts.nft_h_treasury_account.to_account_info(),
-            authority: ctx.accounts.stake_swap_authority.to_account_info(),
-        };
+        // let cpi1_program = ctx.accounts.token_program.to_account_info();
+        // let cpi1_accounts = token::Transfer {
+        //     from: ctx.accounts.nft_h_token_account.to_account_info(),
+        //     to: ctx.accounts.nft_h_treasury_account.to_account_info(),
+        //     authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        // };
 
-        let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
+        // let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
 
-        token::transfer(token_transfer_context, 1)?;
+        // token::transfer(token_transfer_context, 1)?;
 
 
-         //////////////////////////////////////////////
+        //  //////////////////////////////////////////////
 
-         msg!("NFT I");
+        //  msg!("NFT I");
 
        
-         let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-         let cpi_approve_accounts = token::Approve {
-             to: ctx.accounts.nft_i_token_account.to_account_info(),
-             delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-             authority: ctx.accounts.user_a.to_account_info(),
-         };
-         let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-         token::approve(cpi_approve_ctx, 1)?;
+        //  let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        //  let cpi_approve_accounts = token::Approve {
+        //      to: ctx.accounts.nft_i_token_account.to_account_info(),
+        //      delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //      authority: ctx.accounts.user_a.to_account_info(),
+        //  };
+        //  let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        //  token::approve(cpi_approve_ctx, 1)?;
          
  
  
-         let cpi1_program = ctx.accounts.token_program.to_account_info();
-         let cpi1_accounts = token::Transfer {
-             from: ctx.accounts.nft_i_token_account.to_account_info(),
-             to: ctx.accounts.nft_i_treasury_account.to_account_info(),
-             authority: ctx.accounts.stake_swap_authority.to_account_info(),
-         };
+        //  let cpi1_program = ctx.accounts.token_program.to_account_info();
+        //  let cpi1_accounts = token::Transfer {
+        //      from: ctx.accounts.nft_i_token_account.to_account_info(),
+        //      to: ctx.accounts.nft_i_treasury_account.to_account_info(),
+        //      authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        //  };
  
-         let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
+        //  let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
  
-         token::transfer(token_transfer_context, 1)?;
+        //  token::transfer(token_transfer_context, 1)?;
  
  
 
-          //////////////////////////////////////////////
+        //   //////////////////////////////////////////////
 
-        msg!("NFT J");
+        // msg!("NFT J");
 
        
-        let cpi_approve_program = ctx.accounts.token_program.to_account_info();
-        let cpi_approve_accounts = token::Approve {
-            to: ctx.accounts.nft_j_token_account.to_account_info(),
-            delegate: ctx.accounts.stake_swap_authority.to_account_info(),
-            authority: ctx.accounts.user_a.to_account_info(),
-        };
-        let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
-        token::approve(cpi_approve_ctx, 1)?;
+        // let cpi_approve_program = ctx.accounts.token_program.to_account_info();
+        // let cpi_approve_accounts = token::Approve {
+        //     to: ctx.accounts.nft_j_token_account.to_account_info(),
+        //     delegate: ctx.accounts.stake_swap_authority.to_account_info(),
+        //     authority: ctx.accounts.user_a.to_account_info(),
+        // };
+        // let cpi_approve_ctx = CpiContext::new(cpi_approve_program, cpi_approve_accounts);
+        // token::approve(cpi_approve_ctx, 1)?;
         
 
 
-        let cpi1_program = ctx.accounts.token_program.to_account_info();
-        let cpi1_accounts = token::Transfer {
-            from: ctx.accounts.nft_j_token_account.to_account_info(),
-            to: ctx.accounts.nft_j_treasury_account.to_account_info(),
-            authority: ctx.accounts.stake_swap_authority.to_account_info(),
-        };
+        // let cpi1_program = ctx.accounts.token_program.to_account_info();
+        // let cpi1_accounts = token::Transfer {
+        //     from: ctx.accounts.nft_j_token_account.to_account_info(),
+        //     to: ctx.accounts.nft_j_treasury_account.to_account_info(),
+        //     authority: ctx.accounts.stake_swap_authority.to_account_info(),
+        // };
 
-        let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
+        // let token_transfer_context = CpiContext::new_with_signer(cpi1_program, cpi1_accounts, signer);
 
-        token::transfer(token_transfer_context, 1)?;
+        // token::transfer(token_transfer_context, 1)?;
 
 
          //////////////////////////////////////////////
@@ -593,7 +601,7 @@ pub struct Stake<'info> {
         payer = user_a, 
         space = 8 + PdaVault::INIT_SPACE,
         seeds = [b"authority".as_ref(),
-        user_a.key().as_ref() ,
+        user_a.key().as_ref(),
         ],
         bump,
         )]
@@ -624,106 +632,106 @@ pub struct Stake<'info> {
 
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_b_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_b_token_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_b_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_b_token_account: Box<Account<'info, TokenAccount>>,
 
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_c_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_c_token_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_c_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_c_token_account: Box<Account<'info, TokenAccount>>,
 
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_d_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_d_token_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_d_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_d_token_account: Box<Account<'info, TokenAccount>>,
 
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_e_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_e_token_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_e_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_e_token_account: Box<Account<'info, TokenAccount>>,
 
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_f_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_f_token_account: Box<Account<'info, TokenAccount>>,
-
-
-
-
-    #[account(
-        mut,
-        associated_token::mint = nft_g_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_g_token_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_f_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_f_token_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_h_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_h_token_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_g_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_g_token_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_i_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_i_token_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_h_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_h_token_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_j_mint,
-        associated_token::authority = user_a
-        // token::mint = nft_a_mint,
-        // token::authority = user_a
-    )]
-    pub nft_j_token_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_i_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_i_token_account: Box<Account<'info, TokenAccount>>,
+
+
+
+
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_j_mint,
+    //     associated_token::authority = user_a
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = user_a
+    // )]
+    // pub nft_j_token_account: Box<Account<'info, TokenAccount>>,
 
 
     
@@ -757,119 +765,119 @@ pub struct Stake<'info> {
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_b_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_b_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_b_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_b_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_c_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_c_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_c_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_c_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_d_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_d_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_d_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_d_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_e_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_e_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_e_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_e_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_f_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_f_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_f_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_f_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_g_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_g_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_g_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_g_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_h_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_h_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_h_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_h_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_i_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_i_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_i_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_i_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
-    #[account(
-        init,
-        payer = user_a, 
-        associated_token::mint = nft_j_mint, 
-        associated_token::authority = stake_swap_authority 
-        // token::mint = nft_a_mint,
-        // token::authority = stake_swap_authority
-    )]
-    pub nft_j_treasury_account: Box<Account<'info, TokenAccount>>,
+    // #[account(
+    //     init,
+    //     payer = user_a, 
+    //     associated_token::mint = nft_j_mint, 
+    //     associated_token::authority = stake_swap_authority 
+    //     // token::mint = nft_a_mint,
+    //     // token::authority = stake_swap_authority
+    // )]
+    // pub nft_j_treasury_account: Box<Account<'info, TokenAccount>>,
 
 
 
@@ -889,15 +897,15 @@ pub struct Stake<'info> {
         //// NFT MINT
 
     pub nft_a_mint: Account<'info, Mint>,
-    pub nft_b_mint: Account<'info, Mint>,
-    pub nft_c_mint: Account<'info, Mint>,
-    pub nft_d_mint: Account<'info, Mint>,
-    pub nft_e_mint: Account<'info, Mint>,
-    pub nft_f_mint: Account<'info, Mint>,
-    pub nft_g_mint: Account<'info, Mint>,
-    pub nft_h_mint: Account<'info, Mint>,
-    pub nft_i_mint: Account<'info, Mint>,
-    pub nft_j_mint: Account<'info, Mint>,
+    // pub nft_b_mint: Account<'info, Mint>,
+    // pub nft_c_mint: Account<'info, Mint>,
+    // pub nft_d_mint: Account<'info, Mint>,
+    // pub nft_e_mint: Account<'info, Mint>,
+    // pub nft_f_mint: Account<'info, Mint>,
+    // pub nft_g_mint: Account<'info, Mint>,
+    // pub nft_h_mint: Account<'info, Mint>,
+    // pub nft_i_mint: Account<'info, Mint>,
+    // pub nft_j_mint: Account<'info, Mint>,
 
 
 

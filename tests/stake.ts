@@ -69,26 +69,169 @@ describe("STAKE-SWAP", () => {
   // console.log(("===================="));
   // const collection = new anchor.web3.PublicKey("G5WvFzffVU2vLW7Eitym5ebobmFAkXfvtqgkdi2ZJprB");
   // console.log(" COLLECTION ---->", collection);
+
+
+
+
+  /////////////////////////////////////////  MINT ACCOUNT's ///////////////////////////////////////////////
+
   console.log(("===================="));
-  const mint_a = new anchor.web3.PublicKey("ArXMPhALUu3YH854HQNDipfWo4KZbeDCmwGnc4a3whrn");
+  const mint_a = new anchor.web3.PublicKey("FFJPtQrM2R16xB7H3eSkHgeE9kdWZAhkdF5wNc55WTTe");
   console.log(" Mint A ---->", mint_a);
+
+
+
+
   console.log(("===================="));
-  const mint_b = new anchor.web3.PublicKey("2iHwYFE3GG5VsxLbdL1zGHLcXMws1TCUkg94YyA6Jcxf");
+  const mint_b = new anchor.web3.PublicKey("8AF86ar2FEFcutx1jZzGFLeWkfJWAdx9mswVXD5kPmuw");
   console.log(" Mint B ---->", mint_b);
-  console.log(("===================="));
+
+
+
+
+
+
+  // console.log(("===================="));
+  // const mint_c = new anchor.web3.PublicKey("14kGx9zkdV6YgRviQ3V4p5drajmtUfmwsfXTDPrrmX5g");
+  // console.log(" Mint C ---->", mint_c);
+
+
+
+
+
+  // console.log(("===================="));
+  // const mint_d = new anchor.web3.PublicKey("92wqWpNcw8ZK1Mr2nMp9UAwbox1WRiyZVdbWALbC5KMS");
+  // console.log(" Mint D ---->", mint_d);
+
+
+
+
+
+  // console.log(("===================="));
+  // const mint_e = new anchor.web3.PublicKey("pWJ5sL1H9BCukG6kWwvDhiFQLy7rnWMKBfX4LsPVjHE");
+  // console.log(" Mint E ---->", mint_e);
+
+
+
+  // console.log(("===================="));
+  // const mint_f = new anchor.web3.PublicKey("AicCQ8At7BrwZfRQrp95Ea6dD1PwzFiqY1ECi4pX6a3g");
+  // console.log(" Mint F ---->", mint_f);
+
+
+
+  // console.log(("===================="));
+  // const mint_g = new anchor.web3.PublicKey("5qma7D17tTTzbKgaUvnZnZKKhf5jSoxgQLyWZEMuBjzW");
+  // console.log(" Mint G ---->", mint_g);
+
+
+
+
+  // console.log(("===================="));
+  // const mint_h = new anchor.web3.PublicKey("HqALY3ugm726YicX2sNmHPsywHhBUaaxucRrd2VqXvER");
+  // console.log(" Mint H ---->", mint_h);
+
+
+
+
+  // console.log(("===================="));
+  // const mint_i = new anchor.web3.PublicKey("4kCKpKxL24xgBwrf1HS4Xd1NmyXazNsmUG7mhMGPzzWm");
+  // console.log(" Mint I ---->", mint_i);
+
+
+
+
+  // console.log(("===================="));
+  // const mint_j = new anchor.web3.PublicKey("4qWJdj7RgggvJayCQUyAJdMYP1FALpd35L3NeM7SfFHS");
+  // console.log(" Mint J ---->", mint_j);
+  // console.log(("===================="));
   // const metadata_a = new anchor.web3.PublicKey("EVZ6ZiktJNt5Qr7S8QvSwsBmxM2383dHvkmUNAABECVR");
   // console.log(" METADATA ---->", metadata_a);
   // console.log(("===================="));
   // const metadata_b = new anchor.web3.PublicKey("ELdQDmHa9k7yKeyfXwzFrxvFnrtfX4RnrjNqqzQBhHyW");
   // console.log(" METADATA ---->", metadata_b);
   // console.log(("===================="));
-  const TokenAddress_a = new anchor.web3.PublicKey("H1xvsApPcCKLZ1QiP9zuQCKMsp1R6Pi9LkNZANhdYZuw");
+
+//////////////////////////////////// TOKEN ACCOUNTs ////////////////////////////////
+
+  const TokenAddress_a = new anchor.web3.PublicKey("GJHHhttvUkzAHkL747sM44Gwzrn5CFKC2fQ4mnS6XUYJ");
   console.log(" TOKEN ADDRESS A ---->", TokenAddress_a);
   console.log(("===================="));
-  const TokenAddress_b = new anchor.web3.PublicKey("CVsxkZq7WWMrQiwZzRDcHHTFrANYGLgvjPjSCkQmuwX6");
-  console.log(" TOKEN ADDRESS B ---->", TokenAddress_b);
-  console.log(("===================="));
 
+
+
+
+  // const TokenAddress_b = new anchor.web3.PublicKey("2uHtazDzDWWQw4CSRdcZhFB2X77JPLUFcNMQDJ9H3MVa");
+  // console.log(" TOKEN ADDRESS B ---->", TokenAddress_b);
+  // console.log(("===================="));
+
+
+
+
+  // const TokenAddress_c = new anchor.web3.PublicKey("HBhzbhCHe4CJ1Zcgj74u4HiNxcv5A6UHowSnPzBjFmdT");
+  // console.log(" TOKEN ADDRESS C ---->", TokenAddress_c);
+  // console.log(("===================="));
+
+
+
+
+
+  // const TokenAddress_d = new anchor.web3.PublicKey("CXMHw8xHTKfvHySovaNyQn2vDxNQDAZhPHxiZASCsnCN");
+  // console.log(" TOKEN ADDRESS D ---->", TokenAddress_d);
+  // console.log(("===================="));
+
+
+
+
+
+  // const TokenAddress_e = new anchor.web3.PublicKey("BnvZ2Q68qszqTrgTREpYvUZ2ugtZMNqf84toWQPfSm1p");
+  // console.log(" TOKEN ADDRESS E ---->", TokenAddress_e);
+  // console.log(("===================="));
+
+
+
+  // const TokenAddress_f = new anchor.web3.PublicKey("Es6R9kq2fLC4P61wmh9ngo1VrRy2mjQaYkosx3L7TQLw");
+  // console.log(" TOKEN ADDRESS F ---->", TokenAddress_f);
+  // console.log(("===================="));
+
+
+
+
+  // const TokenAddress_g = new anchor.web3.PublicKey("4E9uDxWENqi4kzqmXRvM7tu7Z8Dqf2bEcNLZFAYkMZgR");
+  // console.log(" TOKEN ADDRESS G ---->", TokenAddress_g);
+  // console.log(("===================="));
+
+
+
+
+
+  // const TokenAddress_h = new anchor.web3.PublicKey("6LgXCHxjYbd3kouYpAYAAMeEYjSKSrFHz7ScXvTKykAk");
+  // console.log(" TOKEN ADDRESS H ---->", TokenAddress_h);
+  // console.log(("===================="));
+
+
+
+
+
+
+  // const TokenAddress_i = new anchor.web3.PublicKey("DqXhYkYTYVsf77foruZ6PPfh4shhCfWKm9wFgr2cEKnz");
+  // console.log(" TOKEN ADDRESS I ---->", TokenAddress_i);
+  // console.log(("===================="));
+
+
+
+
+
+  // const TokenAddress_j = new anchor.web3.PublicKey("556bTH3dtqfABLozDRTFvDbNRRMsjw8rkeMWt4wQx2pk");
+  // console.log(" TOKEN ADDRESS J ---->", TokenAddress_j);
+  // console.log(("===================="));
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////
 
   const token_address_for_swap_a = new anchor.web3.PublicKey("Brhjb7xNEKVpa87aNfe4bXE1cfGizqKSgL6ZccS8CmKj");
   console.log(" TOKEN ADDRESS FOR SWAP A ---->", token_address_for_swap_a);
@@ -127,7 +270,7 @@ describe("STAKE-SWAP", () => {
   console.log(("===================="));
   console.log(" STAKE SWAP AUTHORITY ---->", StakeSwapAuth);
 
-
+    ///////////////////////// TREASURY ACCOUNTs /////////////////////
 
   const treasury_a = anchor.utils.token.associatedAddress({
     mint: mint_a,
@@ -138,102 +281,192 @@ describe("STAKE-SWAP", () => {
 
 
 
-  const treasury_b = anchor.utils.token.associatedAddress({
-    mint: mint_b,
-    owner: StakeSwapAuth
-  });
-  console.log("-----------------------");
-  console.log(`TREASURY B Token Address (ATA) ===> ${treasury_b}`);
-
-
-
-  const swap_a = anchor.utils.token.associatedAddress({
-    mint: mint_b,
-    owner: walletPubKey
-  });
-  console.log("-----------------------");
-  console.log(`TREASURY B Token Address (ATA) ===> ${swap_a}`);
-
-
-  const swap_b = anchor.utils.token.associatedAddress({
-    mint: mint_a,
-    owner: user_b_keypair.publicKey
-  });
-  console.log("-----------------------");
-  console.log(`TREASURY B Token Address (ATA) ===> ${swap_b}`);
+  // const treasury_b = anchor.utils.token.associatedAddress({
+  //   mint: mint_b,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY B Token Address (ATA) ===> ${treasury_b}`);
 
 
 
 
-  const [stakeVault, __] = anchor.web3.PublicKey.findProgramAddressSync(
-    [wallet.publicKey.toBuffer(), TokenAddress_a.toBuffer()],
-    program.programId
-  );
+  // const treasury_c = anchor.utils.token.associatedAddress({
+  //   mint: mint_c,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY C Token Address (ATA) ===> ${treasury_c}`);
 
-  console.log(("===================="));
-  console.log("STAKE VAULT PDA ---->", stakeVault);
+
+
+
+
+
+  // const treasury_d = anchor.utils.token.associatedAddress({
+  //   mint: mint_d,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY D Token Address (ATA) ===> ${treasury_d}`);
+
+
+
+
+
+  // const treasury_e = anchor.utils.token.associatedAddress({
+  //   mint: mint_e,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY E Token Address (ATA) ===> ${treasury_e}`);
+
+
+
+
+  // const treasury_f = anchor.utils.token.associatedAddress({
+  //   mint: mint_f,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY F Token Address (ATA) ===> ${treasury_f}`);
+
+
+
+
+
+  // const treasury_g = anchor.utils.token.associatedAddress({
+  //   mint: mint_g,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY G Token Address (ATA) ===> ${treasury_g}`);
+
+
+
+
+  // const treasury_h = anchor.utils.token.associatedAddress({
+  //   mint: mint_h,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY H Token Address (ATA) ===> ${treasury_h}`);
+
+
+
+
+  // const treasury_i = anchor.utils.token.associatedAddress({
+  //   mint: mint_i,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY I Token Address (ATA) ===> ${treasury_i}`);
+
+
+
+
+
+  // const treasury_j = anchor.utils.token.associatedAddress({
+  //   mint: mint_j,
+  //   owner: StakeSwapAuth
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY J Token Address (ATA) ===> ${treasury_j}`);
+
+
+
+
+  //////////////////////////////////////////////////
+
+  // const swap_a = anchor.utils.token.associatedAddress({
+  //   mint: mint_b,
+  //   owner: walletPubKey
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY B Token Address (ATA) ===> ${swap_a}`);
+
+
+
+
+  // const swap_b = anchor.utils.token.associatedAddress({
+  //   mint: mint_a,
+  //   owner: user_b_keypair.publicKey
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY B Token Address (ATA) ===> ${swap_b}`);
+
+
+
+
+  // const [stakeVault, __] = anchor.web3.PublicKey.findProgramAddressSync(
+  //   [wallet.publicKey.toBuffer(), TokenAddress_a.toBuffer()],
+  //   program.programId
+  // );
+
+  // console.log(("===================="));
+  // console.log("STAKE VAULT PDA ---->", stakeVault);
 
 
 
   //FIND PDA FOR METADATA NFT A
-  const metadataAddress_a = anchor.web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      mint_a.toBuffer(),
-    ],
-    TOKEN_METADATA_PROGRAM_ID
-  )[0];
-  console.log("====================");
-  console.log(`metadata a initialized and its address ===> ${metadataAddress_a}`);
+  // const metadataAddress_a = anchor.web3.PublicKey.findProgramAddressSync(
+  //   [
+  //     Buffer.from("metadata"),
+  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+  //     mint_a.toBuffer(),
+  //   ],
+  //   TOKEN_METADATA_PROGRAM_ID
+  // )[0];
+  // console.log("====================");
+  // console.log(`metadata a initialized and its address ===> ${metadataAddress_a}`);
 
 
 
   //FIND PDA FOR METADATA NFT B
-  const metadataAddress_b = anchor.web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      mint_b.toBuffer(),
-    ],
-    TOKEN_METADATA_PROGRAM_ID
-  )[0];
-  console.log("====================");
-  console.log(`metadata b initialized and its address ===> ${metadataAddress_b}`);
+  // const metadataAddress_b = anchor.web3.PublicKey.findProgramAddressSync(
+  //   [
+  //     Buffer.from("metadata"),
+  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+  //     mint_b.toBuffer(),
+  //   ],
+  //   TOKEN_METADATA_PROGRAM_ID
+  // )[0];
+  // console.log("====================");
+  // console.log(`metadata b initialized and its address ===> ${metadataAddress_b}`);
 
 
 
 
   //FIND PDA FOR MASTER EDITION A
-  const masterEditionAddress_a = (anchor.web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      mint_a.toBuffer(),
-      Buffer.from("edition"),
-    ],
-    TOKEN_METADATA_PROGRAM_ID,
-  ))[0];
-  console.log("====================");
-  console.log(
-    `Master edition A initialized and its address ===> ${masterEditionAddress_a}`);
+  // const masterEditionAddress_a = (anchor.web3.PublicKey.findProgramAddressSync(
+  //   [
+  //     Buffer.from("metadata"),
+  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+  //     mint_a.toBuffer(),
+  //     Buffer.from("edition"),
+  //   ],
+  //   TOKEN_METADATA_PROGRAM_ID,
+  // ))[0];
+  // console.log("====================");
+  // console.log(
+  //   `Master edition A initialized and its address ===> ${masterEditionAddress_a}`);
 
 
 
 
   //FIND PDA FOR MASTER EDITION B
-  const masterEditionAddress_b = (anchor.web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      mint_b.toBuffer(),
-      Buffer.from("edition"),
-    ],
-    TOKEN_METADATA_PROGRAM_ID,
-  ))[0];
-  console.log("====================");
-  console.log(
-    `Master edition A initialized and its address ===> ${masterEditionAddress_b}`);
+  // const masterEditionAddress_b = (anchor.web3.PublicKey.findProgramAddressSync(
+  //   [
+  //     Buffer.from("metadata"),
+  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+  //     mint_b.toBuffer(),
+  //     Buffer.from("edition"),
+  //   ],
+  //   TOKEN_METADATA_PROGRAM_ID,
+  // ))[0];
+  // console.log("====================");
+  // console.log(
+  //   `Master edition A initialized and its address ===> ${masterEditionAddress_b}`);
 
 
 
@@ -263,17 +496,44 @@ describe("STAKE-SWAP", () => {
       let StakeIx = await program.methods
         .stake(mint_a, mint_b)
         .accounts({
+          // nftBMint: mint_b,
+          // nftBTokenAccount: TokenAddress_b ,
+          // nftBTreasuryAccount: treasury_b,
+          // nftCMint: mint_c,
+          // nftCTokenAccount: TokenAddress_c ,
+          // nftCTreasuryAccount: treasury_c,
+          // nftDMint: mint_d,
+          // nftDTokenAccount: TokenAddress_d,
+          // nftDTreasuryAccount: treasury_d,
+          // nftEMint: mint_e ,
+          // nftETokenAccount: TokenAddress_e,
+          // nftETreasuryAccount: treasury_e,
+          // nftFMint: mint_f,
+          // nftFTokenAccount: TokenAddress_f,
+          // nftFTreasuryAccount: treasury_f,
+          // nftGMint: mint_g,
+          // nftGTokenAccount: TokenAddress_g,
+          // nftGTreasuryAccount: treasury_g,
+          // nftHMint: mint_h,
+          // nftHTokenAccount: TokenAddress_h,
+          // nftHTreasuryAccount: treasury_h,
+          // nftIMint: mint_i ,
+          // nftITokenAccount: TokenAddress_i,
+          // nftITreasuryAccount: treasury_i,
+          // nftJMint: mint_j,
+          // nftJTokenAccount: TokenAddress_j,
+          // nftJTreasuryAccount: treasury_j,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
           userA: wallet.publicKey,
           nftATreasuryAccount: treasury_a,
           // nftBTreasuryAccount: treasury_b,
           // userB: user_b,
-          nftBEdition: masterEditionAddress_b,
+          // nftBEdition: masterEditionAddress_b,
 
           // nftBMint: mint_b,
           // nftBTokenAccount: TokenAddress_b,
           metadataProgram: TOKEN_METADATA_PROGRAM_ID,
-          nftAEdition: masterEditionAddress_a,
+          // nftAEdition: masterEditionAddress_a,
           nftAMint: mint_a,
           nftATokenAccount: TokenAddress_a,
           stakeSwapAuthority: StakeSwapAuth,
