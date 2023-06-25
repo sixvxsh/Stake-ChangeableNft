@@ -378,7 +378,7 @@ describe("STAKE-SWAP", () => {
 
       try {
 
-        const signature = await sendAndConfirmTransaction(provider.connection, SwapTx, [wallet.payer]);
+        const signature = await sendAndConfirmTransaction(provider.connection, SwapTx, [wallet.payer , user_b_keypair]);
         console.log("-----------------------");
         console.log("SEND AND CONFIRM SWAP TRANSACTION SIGNATURE =====>", signature);
 

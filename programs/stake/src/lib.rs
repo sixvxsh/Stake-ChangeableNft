@@ -424,7 +424,7 @@ pub struct Swap<'info> {
 
     #[account(
         init,
-        payer = user_b,
+        payer = user_a,
         associated_token::mint = nft_a_mint,
         associated_token::authority = user_b
         // token::mint = nft_a_mint,
