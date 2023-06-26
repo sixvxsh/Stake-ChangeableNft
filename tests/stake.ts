@@ -42,6 +42,7 @@ describe("STAKE-SWAP", () => {
 
 
 
+
   // const user_b_keypair = Keypair.fromSecretKey(
   //   Uint8Array.from([
   //     148, 220, 74, 86, 68, 72, 55, 74, 186, 215,
@@ -75,7 +76,7 @@ describe("STAKE-SWAP", () => {
 
   console.log(("===================="));
   const mint = new anchor.web3.PublicKey("FFJPtQrM2R16xB7H3eSkHgeE9kdWZAhkdF5wNc55WTTe");
-  console.log(" Mint A ---->", mint);
+  console.log(" Mint  ---->", mint);
 
 
 
@@ -123,17 +124,17 @@ describe("STAKE-SWAP", () => {
   /////////////////////////// PDAs /////////////////////
 
 
-  const [StakeSwapAuth, authority] = anchor.web3.PublicKey.findProgramAddressSync(
-    [
-      // anchor.utils.bytes.utf8.encode("authority"),
-      Buffer.from("authority"),
-      provider.wallet.publicKey.toBuffer(),
-    ],
-    program.programId
-  );
+  // const [StakeSwapAuth, authority] = anchor.web3.PublicKey.findProgramAddressSync(
+  //   [
+  //     // anchor.utils.bytes.utf8.encode("authority"),
+  //     Buffer.from("authority"),
+  //     provider.wallet.publicKey.toBuffer(),
+  //   ],
+  //   program.programId
+  // );
 
-  console.log(("===================="));
-  console.log(" STAKE SWAP AUTHORITY ---->", StakeSwapAuth);
+  // console.log(("===================="));
+  // console.log(" STAKE SWAP AUTHORITY ---->", StakeSwapAuth);
 
 
   const [nft_vault, stake1] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -146,22 +147,32 @@ describe("STAKE-SWAP", () => {
   );
 
   console.log(("===================="));
-  console.log(" NFT VAULT PDA ---->", StakeSwapAuth);
+  console.log(" NFT VAULT PDA ---->", nft_vault);
 
+  it("FETCH PDA" , async () => {
+    const pdadata = await program.account.nftVault.fetch(nft_vault);
+    console.log("PDA DATA", pdadata);
+  });
+ 
+
+  // console.log(`Reviewer: `, pdadata.toString());
+  // console.log(`Restaurant: `, pdadata.);
+  // console.log(`Review: `, pdadata.review);
+  // console.log(`Rating: `, pdadata.rating);
 
 
   ///////////////////////// TREASURY ACCOUNTs /////////////////////
 
-  const nft_treasury_token_account = anchor.utils.token.associatedAddress({
-    mint: mint,
-    owner: nft_vault
-  });
-  console.log("-----------------------");
-  console.log(`TREASURY A Token Address (ATA) ===> ${nft_treasury_token_account}`);
+  // const nft_treasury_token_account = anchor.utils.token.associatedAddress({
+  //   mint: mint,
+  //   owner: nft_vault
+  // });
+  // console.log("-----------------------");
+  // console.log(`TREASURY A Token Address (ATA) ===> ${nft_treasury_token_account}`);
 
 
 
- 
+
 
 
 
@@ -183,77 +194,76 @@ describe("STAKE-SWAP", () => {
   });
 
 
-  it('IT STAKE', async () => {
+  // it('IT STAKE', async () => {
 
-    console.log("THE BEGINING OF IT STAKE ...");
+  //   console.log("THE BEGINING OF IT STAKE ...");
 
-    try {
-      let StakeIx = await program.methods
-        .stake()
-        .accounts({
-          nftMint: mint,
-          nftTokenAccount: TokenAccount,
-          nftTreasuryTokenAccount: nft_treasury_token_account,
-          nftVault: nft_vault,
-          owner: programOwner,
-          stakeSwapAuthority: StakeSwapAuth ,
-          user: programOwner,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-          metadataProgram: TOKEN_METADATA_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        })
-        .signers([wallet.payer])
-        .instruction()
+  //   try {
+  //     let StakeIx = await program.methods
+  //       .stake()
+  //       .accounts({
+  //         nftMint: mint,
+  //         nftTokenAccount: TokenAccount,
+  //         nftTreasuryTokenAccount: nft_treasury_token_account,
+  //         nftVault: nft_vault,
+  //         owner: programOwner,
+  //         user: programOwner,
+  //         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+  //         metadataProgram: TOKEN_METADATA_PROGRAM_ID,
+  //         systemProgram: SystemProgram.programId,
+  //         tokenProgram: TOKEN_PROGRAM_ID,
+  //       })
+  //       .signers([wallet.payer])
+  //       .instruction()
 
-      const StakeTx = new Transaction()
-        .add(addPriorityFee)
-        .add(modifyComputeUnits)
-        .add(StakeIx)
-      console.log("====================");
-      console.log("INSTRUCTIONS ADDED TO STAKE TX");
+  //     const StakeTx = new Transaction()
+  //       .add(addPriorityFee)
+  //       .add(modifyComputeUnits)
+  //       .add(StakeIx)
+  //     console.log("====================");
+  //     console.log("INSTRUCTIONS ADDED TO STAKE TX");
 
-      const blockhashData = await BLOCKHASH();
-      const { blockhash, lastValidBlockHeight } = blockhashData;
-      console.log("====================");
-      console.log("RECENT BLOCKHASH =====>", blockhash);
-      console.log("====================");
-      console.log("lastValidBlockHeight =====>", lastValidBlockHeight);
+  //     const blockhashData = await BLOCKHASH();
+  //     const { blockhash, lastValidBlockHeight } = blockhashData;
+  //     console.log("====================");
+  //     console.log("RECENT BLOCKHASH =====>", blockhash);
+  //     console.log("====================");
+  //     console.log("lastValidBlockHeight =====>", lastValidBlockHeight);
 
-      StakeTx.recentBlockhash = blockhash;
-      StakeTx.feePayer = wallet.publicKey;
-
-
-      try {
-
-        const signature = await sendAndConfirmTransaction(provider.connection, StakeTx, [wallet.payer]);
-        console.log("-----------------------");
-        console.log("SEND AND CONFIRM STAKE TRANSACTION SIGNATURE =====>", signature);
+  //     StakeTx.recentBlockhash = blockhash;
+  //     StakeTx.feePayer = wallet.publicKey;
 
 
+  //     try {
 
-        const confirmMintTx = await program.provider.connection.confirmTransaction({
-          blockhash,
-          lastValidBlockHeight,
-          signature,
-        });
-        console.log("-----------------------");
-        console.log("CONFIRM TRANSACTION =====>", confirmMintTx);
+  //       const signature = await sendAndConfirmTransaction(provider.connection, StakeTx, [wallet.payer]);
+  //       console.log("-----------------------");
+  //       console.log("SEND AND CONFIRM STAKE TRANSACTION SIGNATURE =====>", signature);
 
 
-        const result = await provider.connection.getParsedTransaction(signature, "confirmed");
-        console.log("-----------------------");
-        console.log("STAKE TX RESULT =====>", result);
-      } catch (Error) {
-        console.log("ERROR IN STAKE TRY TX");
-        console.error(Error);
-      }
 
-    } catch (Error) {
-      console.log(`STAKE ERROR IN BIG PICTURE OF STAKE ${Error}`);
-      console.error(Error)
-    }
-  });
+  //       const confirmMintTx = await program.provider.connection.confirmTransaction({
+  //         blockhash,
+  //         lastValidBlockHeight,
+  //         signature,
+  //       });
+  //       console.log("-----------------------");
+  //       console.log("CONFIRM TRANSACTION =====>", confirmMintTx);
+
+
+  //       const result = await provider.connection.getParsedTransaction(signature, "confirmed");
+  //       console.log("-----------------------");
+  //       console.log("STAKE TX RESULT =====>", result);
+  //     } catch (Error) {
+  //       console.log("ERROR IN STAKE TRY TX");
+  //       console.error(Error);
+  //     }
+
+  //   } catch (Error) {
+  //     console.log(`STAKE ERROR IN BIG PICTURE OF STAKE ${Error}`);
+  //     console.error(Error)
+  //   }
+  // });
 
 
   // it("IT SWAP", async () => {
@@ -560,88 +570,88 @@ describe("STAKE-SWAP", () => {
 
 
 
-  //////////////////////////////////////////////////
+//////////////////////////////////////////////////
 
 
 
-  //FIND PDA FOR METADATA NFT A
-  // const metadataAddress_a = anchor.web3.PublicKey.findProgramAddressSync(
-  //   [
-  //     Buffer.from("metadata"),
-  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-  //     mint_a.toBuffer(),
-  //   ],
-  //   TOKEN_METADATA_PROGRAM_ID
-  // )[0];
-  // console.log("====================");
-  // console.log(`metadata a initialized and its address ===> ${metadataAddress_a}`);
-
-
-
-
-  //FIND PDA FOR METADATA NFT B
-  // const metadataAddress_b = anchor.web3.PublicKey.findProgramAddressSync(
-  //   [
-  //     Buffer.from("metadata"),
-  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-  //     mint_b.toBuffer(),
-  //   ],
-  //   TOKEN_METADATA_PROGRAM_ID
-  // )[0];
-  // console.log("====================");
-  // console.log(`metadata b initialized and its address ===> ${metadataAddress_b}`);
+//FIND PDA FOR METADATA NFT A
+// const metadataAddress_a = anchor.web3.PublicKey.findProgramAddressSync(
+//   [
+//     Buffer.from("metadata"),
+//     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+//     mint_a.toBuffer(),
+//   ],
+//   TOKEN_METADATA_PROGRAM_ID
+// )[0];
+// console.log("====================");
+// console.log(`metadata a initialized and its address ===> ${metadataAddress_a}`);
 
 
 
 
-
-  //FIND PDA FOR MASTER EDITION A
-  // const masterEditionAddress_a = (anchor.web3.PublicKey.findProgramAddressSync(
-  //   [
-  //     Buffer.from("metadata"),
-  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-  //     mint_a.toBuffer(),
-  //     Buffer.from("edition"),
-  //   ],
-  //   TOKEN_METADATA_PROGRAM_ID,
-  // ))[0];
-  // console.log("====================");
-  // console.log(
-  //   `Master edition A initialized and its address ===> ${masterEditionAddress_a}`);
-
-
-
-
-  //FIND PDA FOR MASTER EDITION B
-  // const masterEditionAddress_b = (anchor.web3.PublicKey.findProgramAddressSync(
-  //   [
-  //     Buffer.from("metadata"),
-  //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-  //     mint_b.toBuffer(),
-  //     Buffer.from("edition"),
-  //   ],
-  //   TOKEN_METADATA_PROGRAM_ID,
-  // ))[0];
-  // console.log("====================");
-  // console.log(
-  //   `Master edition A initialized and its address ===> ${masterEditionAddress_b}`);
+//FIND PDA FOR METADATA NFT B
+// const metadataAddress_b = anchor.web3.PublicKey.findProgramAddressSync(
+//   [
+//     Buffer.from("metadata"),
+//     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+//     mint_b.toBuffer(),
+//   ],
+//   TOKEN_METADATA_PROGRAM_ID
+// )[0];
+// console.log("====================");
+// console.log(`metadata b initialized and its address ===> ${metadataAddress_b}`);
 
 
 
 
 
+//FIND PDA FOR MASTER EDITION A
+// const masterEditionAddress_a = (anchor.web3.PublicKey.findProgramAddressSync(
+//   [
+//     Buffer.from("metadata"),
+//     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+//     mint_a.toBuffer(),
+//     Buffer.from("edition"),
+//   ],
+//   TOKEN_METADATA_PROGRAM_ID,
+// ))[0];
+// console.log("====================");
+// console.log(
+//   `Master edition A initialized and its address ===> ${masterEditionAddress_a}`);
 
-    // const stakeswapSeeds = [
-  //   provider.wallet.publicKey.toBuffer(),
-  //   Buffer.from(anchor.utils.bytes.utf8.encode("authority")),
-  //   mint_a.toBuffer(),
-  //   mint_b.toBuffer(),
-  // ];
 
 
 
-  // const [StakeSwapAuth, _] = anchor.web3.PublicKey.findProgramAddressSync(
-  //   stakeswapSeeds,
-  //   program.programId
-  // );
+//FIND PDA FOR MASTER EDITION B
+// const masterEditionAddress_b = (anchor.web3.PublicKey.findProgramAddressSync(
+//   [
+//     Buffer.from("metadata"),
+//     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+//     mint_b.toBuffer(),
+//     Buffer.from("edition"),
+//   ],
+//   TOKEN_METADATA_PROGRAM_ID,
+// ))[0];
+// console.log("====================");
+// console.log(
+//   `Master edition A initialized and its address ===> ${masterEditionAddress_b}`);
+
+
+
+
+
+
+// const stakeswapSeeds = [
+//   provider.wallet.publicKey.toBuffer(),
+//   Buffer.from(anchor.utils.bytes.utf8.encode("authority")),
+//   mint_a.toBuffer(),
+//   mint_b.toBuffer(),
+// ];
+
+
+
+// const [StakeSwapAuth, _] = anchor.web3.PublicKey.findProgramAddressSync(
+//   stakeswapSeeds,
+//   program.programId
+// );
 
