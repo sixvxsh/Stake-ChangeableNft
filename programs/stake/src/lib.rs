@@ -84,7 +84,7 @@ pub mod stake {
 
         msg!("Transfered NFT_A from user A to program's treasury");
 
-        ctx.accounts.nft_vault.token_account = ctx.accounts.nft_token_account.key();
+        ctx.accounts.nft_vault.token_account = ctx.accounts.nft_treasury_token_account.key();
         ctx.accounts.nft_vault.mint_nft = ctx.accounts.nft_mint.key();
         ctx.accounts.nft_vault.user_pubkey = ctx.accounts.user.key();
 
@@ -348,8 +348,6 @@ pub struct NftVault {
     pub mint_nft: Pubkey,
     pub date: u64,
     pub user_pubkey: Pubkey,
-    // pub type_of: String, // 4 + len
-    // pub req: 
 }
 
 
