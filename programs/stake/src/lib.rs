@@ -195,12 +195,12 @@ pub struct Initialize <'info> {
 pub struct Stake<'info> {
 
     /// CHECK: Manual validation
-    #[account(
-        mut,
-        seeds = [b"authority".as_ref(), owner.key().as_ref()],
-        bump,
-        )]
-    pub stake_swap_authority: Box<Account<'info , StakeVault>>,
+    // #[account(
+    //     mut,
+    //     seeds = [b"authority".as_ref(), owner.key().as_ref()],
+    //     bump,
+    //     )]
+    // pub stake_swap_authority: Box<Account<'info , StakeVault>>,
 
 
     /// CHECK: Manual validation
@@ -346,7 +346,7 @@ pub struct NftVault {
     pub token_account: Pubkey,
     pub mint_nft: Pubkey,
     pub date: u64,
-    pub type_of: String, // 4 + len
+    // pub type_of: String, // 4 + len
     // pub req: 
 }
 
