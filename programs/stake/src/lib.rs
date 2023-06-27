@@ -308,6 +308,9 @@ pub struct Swap<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
 
+    /// CHECK: Manual validation
+    #[account(mut)]
+    pub user_swap: AccountInfo<'info>,
 
 
     #[account(
@@ -327,13 +330,21 @@ pub struct Swap<'info> {
     pub nft_treasury_token_account: Box<Account<'info, TokenAccount>>,
 
 
+    #[account(
+        mut,
+        associated_token::mint = nft_mint,
+        associated_token::authority = user
+    )]
+    pub nft_token_account: Box<Account<'info, TokenAccount>>,
+
+
 
 
     #[account(
         init,
         payer = user,
         associated_token::mint = nft_mint,
-        associated_token::authority = user
+        associated_token::authority = user_swap
 
     )]
     pub nft_token_swap_account: Box<Account<'info, TokenAccount>>,
@@ -348,7 +359,7 @@ pub struct Swap<'info> {
     pub system_program: Program<'info, System>,
 
     pub token_program: Program<'info, Token>,
-    
+
     pub metadata_program: Program<'info, Metadata>,
 
 
