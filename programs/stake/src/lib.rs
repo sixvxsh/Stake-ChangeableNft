@@ -93,20 +93,20 @@ pub mod stake {
         ctx.accounts.nft_vault.user_pubkey = ctx.accounts.user.key();
 
 
-        msg!("TREANSFERING 1 SOL");
+        // msg!("TREANSFERING 1 SOL");
 
-        msg!("TRANSFER FROM: {}", &ctx.accounts.user.key());
-        msg!("TRANSFER TO: {}", &ctx.accounts.sol_treasury.key());
+        // msg!("TRANSFER FROM: {}", &ctx.accounts.user.key());
+        // msg!("TRANSFER TO: {}", &ctx.accounts.sol_treasury.key());
 
-        let cpi_sol_context = CpiContext::new(
-            ctx.accounts.system_program.to_account_info(), 
-            system_program::Transfer {
-                from: ctx.accounts.user.to_account_info(),
-                to: ctx.accounts.sol_treasury.to_account_info(),
-            });
-        system_program::transfer(cpi_sol_context, 1000000000)?;
+        // let cpi_sol_context = CpiContext::new(
+        //     ctx.accounts.system_program.to_account_info(), 
+        //     system_program::Transfer {
+        //         from: ctx.accounts.user.to_account_info(),
+        //         to: ctx.accounts.sol_treasury.to_account_info(),
+        //     });
+        // system_program::transfer(cpi_sol_context, 1000000000)?;
 
-        msg!("TRANSFERED 1 SOL TO SOL TREASURY");
+        // msg!("TRANSFERED 1SOL TO SOL TREASURY");
 
         Ok(())
 
@@ -304,7 +304,7 @@ pub struct Stake<'info> {
     )]
     pub nft_vault: Box<Account<'info, NftVault>>,
 
-
+    /// CHECK: Manual validation
     #[account(mut)]
     pub sol_treasury: AccountInfo<'info>,
 
