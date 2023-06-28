@@ -85,7 +85,7 @@ describe("STAKE-SWAP", () => {
   /////////////////////////////////////////  MINT ACCOUNT's //////////////////////////////////////////////
 
   console.log(("===================="));
-  const mint = new anchor.web3.PublicKey("4uiSRRcYcjsFkW7P5NuCbT2sTXiPadzae5HgySi2D3gr");
+  const mint = new anchor.web3.PublicKey("6fpMdSdfGKE4LmkWnTtvemnQi1a2HkzeX96qTdgEUfFq");
   console.log(" Mint  ---->", mint);
 
 
@@ -114,7 +114,7 @@ describe("STAKE-SWAP", () => {
 
   //////////////////////////////////////////////////////////////////
 
-  const token_address_for_swap = new anchor.web3.PublicKey("BAE74A1Ln58inXp8RKSgmtwM23FMxDC6aR1ZepEyVwmh");
+  const token_address_for_swap = new anchor.web3.PublicKey("CEMwjQou1R9DCCPUVvBi51gbLwhJ3ahm9HTXTxd6EfHM");
   console.log(" TOKEN ADDRESS FOR SWAP A ---->", token_address_for_swap);
   console.log(("===================="));
 
@@ -200,121 +200,34 @@ describe("STAKE-SWAP", () => {
   });
 
 
-  it('IT STAKE', async () => {
+  // it('IT STAKE', async () => {
 
-    console.log("THE BEGINING OF IT STAKE ...");
+  //   console.log("THE BEGINING OF IT STAKE ...");
 
-    try {
-      let StakeIx = await program.methods
-        .stake()
-        .accounts({
-          nftMint: mint,
-          nftTokenAccount: TokenAccount,
-          nftTreasuryTokenAccount: nft_treasury_token_account,
-          nftVault: nft_vault,
-          solTreasury: sol_treasury_pub,
-          user: user_b,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-          metadataProgram: TOKEN_METADATA_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        })
-        .signers([user_b_keypair])
-        .instruction()
-
-      const StakeTx = new Transaction()
-        .add(addPriorityFee)
-        .add(modifyComputeUnits)
-        .add(StakeIx)
-      console.log("====================");
-      console.log("INSTRUCTIONS ADDED TO STAKE TX");
-
-      const blockhashData = await BLOCKHASH();
-      const { blockhash, lastValidBlockHeight } = blockhashData;
-      console.log("====================");
-      console.log("RECENT BLOCKHASH =====>", blockhash);
-      console.log("====================");
-      console.log("lastValidBlockHeight =====>", lastValidBlockHeight);
-
-      StakeTx.recentBlockhash = blockhash;
-      StakeTx.feePayer = wallet.publicKey;
-
-
-      try {
-        // for sending this transaction the wallet.payer needed
-        const signature = await sendAndConfirmTransaction(provider.connection, StakeTx, [wallet.payer , user_b_keypair]);
-        console.log("-----------------------");
-        console.log("SEND AND CONFIRM STAKE TRANSACTION SIGNATURE =====>", signature);
-
-
-
-        const confirmMintTx = await program.provider.connection.confirmTransaction({
-          blockhash,
-          lastValidBlockHeight,
-          signature,
-        });
-        console.log("-----------------------");
-        console.log("CONFIRM TRANSACTION =====>", confirmMintTx);
-
-
-        const result = await provider.connection.getParsedTransaction(signature, "confirmed");
-        console.log("-----------------------");
-        console.log("STAKE TX RESULT =====>", result);
-      } catch (Error) {
-        console.log("ERROR IN STAKE TRY TX");
-        console.error(Error);
-      }
-
-    } catch (Error) {
-      console.log(`STAKE ERROR IN BIG PICTURE OF STAKE ${Error}`);
-      console.error(Error)
-    }
-  });
-
-
-
-  it("FETCH PDA" , async () => {
-    const pdadata = await program.account.nftVault.fetch(nft_vault);
-    console.log("PDA DATA", pdadata);
-  });
-
-
-  // it("IT SWAP", async () => {
-  //   console.log("THE BEGINING OF IT SWAP ...");
   //   try {
-  //     let SwapIx = await program.methods
-  //       .swap()
+  //     let StakeIx = await program.methods
+  //       .stake()
   //       .accounts({
   //         nftMint: mint,
-  //         nftTokenSwapAccount: token_address_for_swap,
+  //         nftTokenAccount: TokenAccount,
   //         nftTreasuryTokenAccount: nft_treasury_token_account,
   //         nftVault: nft_vault,
-  //         user: wallet.publicKey,
-  //         userSwap: user_b,
-  //         nftTokenAccount: TokenAccount,
-  //         // nftASwapAccount: swap_a,
-  //         // nftBSwapAccount: swap_b,
-  //         // stakeSwapAuthority: StakeSwapAuth,
+  //         solTreasury: sol_treasury_pub,
+  //         user: user_b,
   //         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-  //         // userA: provider.wallet.publicKey,
-  //         // nftATreasuryAccount: treasury_a,
-  //         // nftBTreasuryAccount: treasury_b,
-  //         // userB: user_b,
-  //         // nftBMint: mint_b,
-  //         // nftAMint: mint_a,
   //         metadataProgram: TOKEN_METADATA_PROGRAM_ID,
   //         systemProgram: SystemProgram.programId,
   //         tokenProgram: TOKEN_PROGRAM_ID,
   //       })
-  //       .signers([ user_b_keypair ])
+  //       .signers([user_b_keypair])
   //       .instruction()
 
-  //     const SwapTx = new Transaction()
+  //     const StakeTx = new Transaction()
   //       .add(addPriorityFee)
   //       .add(modifyComputeUnits)
-  //       .add(SwapIx)
+  //       .add(StakeIx)
   //     console.log("====================");
-  //     console.log("INSTRUCTIONS ADDED TO SWAP TX");
+  //     console.log("INSTRUCTIONS ADDED TO STAKE TX");
 
   //     const blockhashData = await BLOCKHASH();
   //     const { blockhash, lastValidBlockHeight } = blockhashData;
@@ -323,15 +236,16 @@ describe("STAKE-SWAP", () => {
   //     console.log("====================");
   //     console.log("lastValidBlockHeight =====>", lastValidBlockHeight);
 
-  //     SwapTx.recentBlockhash = blockhash;
-  //     SwapTx.feePayer = wallet.publicKey;
+  //     StakeTx.recentBlockhash = blockhash;
+  //     StakeTx.feePayer = wallet.publicKey;
 
 
   //     try {
-
-  //       const signature = await sendAndConfirmTransaction(provider.connection, SwapTx, [wallet.payer]);
+  //       // for sending this transaction the wallet.payer needed
+  //       const signature = await sendAndConfirmTransaction(provider.connection, StakeTx, [wallet.payer , user_b_keypair]);
   //       console.log("-----------------------");
-  //       console.log("SEND AND CONFIRM SWAP TRANSACTION SIGNATURE =====>", signature);
+  //       console.log("SEND AND CONFIRM STAKE TRANSACTION SIGNATURE =====>", signature);
+
 
 
   //       const confirmMintTx = await program.provider.connection.confirmTransaction({
@@ -345,18 +259,95 @@ describe("STAKE-SWAP", () => {
 
   //       const result = await provider.connection.getParsedTransaction(signature, "confirmed");
   //       console.log("-----------------------");
-  //       console.log("SWAP TX RESULT =====>", result);
+  //       console.log("STAKE TX RESULT =====>", result);
   //     } catch (Error) {
-  //       console.log("ERROR IN SWAP TRY TX");
+  //       console.log("ERROR IN STAKE TRY TX");
   //       console.error(Error);
   //     }
 
   //   } catch (Error) {
-  //     console.log(`SWAP ERROR IN BIG TRY-CATCH OF SWAP ${Error}`);
+  //     console.log(`STAKE ERROR IN BIG PICTURE OF STAKE ${Error}`);
   //     console.error(Error)
   //   }
-
   // });
+
+
+
+  it("FETCH PDA" , async () => {
+    const pdadata = await program.account.nftVault.fetch(nft_vault);
+    console.log("PDA DATA", pdadata);
+  });
+
+
+  it("IT SWAP", async () => {
+    console.log("THE BEGINING OF IT SWAP ...");
+    try {
+      let SwapIx = await program.methods
+        .swap()
+        .accounts({
+          solTreasury: sol_treasury_pub,
+          nftMint: mint,
+          nftTokenSwapAccount: token_address_for_swap,
+          nftTreasuryTokenAccount: nft_treasury_token_account,
+          nftVault: nft_vault,
+          user: wallet.publicKey,
+          userReceiver: user_b,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+          metadataProgram: TOKEN_METADATA_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        })
+        .signers([ wallet.payer , user_b_keypair  ])
+        .instruction()
+
+      const SwapTx = new Transaction()
+        .add(addPriorityFee)
+        .add(modifyComputeUnits)
+        .add(SwapIx)
+      console.log("====================");
+      console.log("INSTRUCTIONS ADDED TO SWAP TX");
+
+      const blockhashData = await BLOCKHASH();
+      const { blockhash, lastValidBlockHeight } = blockhashData;
+      console.log("====================");
+      console.log("RECENT BLOCKHASH =====>", blockhash);
+      console.log("====================");
+      console.log("lastValidBlockHeight =====>", lastValidBlockHeight);
+
+      SwapTx.recentBlockhash = blockhash;
+      SwapTx.feePayer = wallet.publicKey;
+
+
+      try {
+
+        const signature = await sendAndConfirmTransaction(provider.connection, SwapTx, [wallet.payer, user_b_keypair , sol_treasury_keypair]);
+        console.log("-----------------------");
+        console.log("SEND AND CONFIRM SWAP TRANSACTION SIGNATURE =====>", signature);
+
+
+        const confirmMintTx = await program.provider.connection.confirmTransaction({
+          blockhash,
+          lastValidBlockHeight,
+          signature,
+        });
+        console.log("-----------------------");
+        console.log("CONFIRM TRANSACTION =====>", confirmMintTx);
+
+
+        const result = await provider.connection.getParsedTransaction(signature, "confirmed");
+        console.log("-----------------------");
+        console.log("SWAP TX RESULT =====>", result);
+      } catch (Error) {
+        console.log("ERROR IN SWAP TRY TX");
+        console.error(Error);
+      }
+
+    } catch (Error) {
+      console.log(`SWAP ERROR IN BIG TRY-CATCH OF SWAP ${Error}`);
+      console.error(Error)
+    }
+
+  });
 });
 
 

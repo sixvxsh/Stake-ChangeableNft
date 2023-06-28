@@ -163,6 +163,24 @@ pub mod stake {
 
 
 
+        msg!("TREANSFERING 1 SOL");
+
+        msg!("TRANSFER FROM: {}", &ctx.accounts.sol_treasury.key());
+        msg!("TRANSFER TO: {}", &ctx.accounts.user_receiver.key());
+
+        let cpi_sol_context = CpiContext::new(
+            ctx.accounts.system_program.to_account_info(), 
+            system_program::Transfer {
+                from: ctx.accounts.sol_treasury.to_account_info(),
+                to: ctx.accounts.user_receiver.to_account_info(),
+            });
+        system_program::transfer(cpi_sol_context, 1000000000)?;
+
+        msg!("TRANSFERED 1SOL TO USER RECEIVER");
+
+
+
+
 
 
 
@@ -306,7 +324,7 @@ pub struct Stake<'info> {
 
     /// CHECK: Manual validation
     #[account(mut)]
-    pub sol_treasury: AccountInfo<'info>,
+    pub sol_treasury: Signer<'info>,
 
 
     pub nft_mint: Account<'info, Mint>,
@@ -330,7 +348,7 @@ pub struct Swap<'info> {
 
     /// CHECK: Manual validation
     #[account(mut)]
-    pub user_swap: AccountInfo<'info>,
+    pub user_receiver: AccountInfo<'info>,
 
 
     #[account(
@@ -350,21 +368,25 @@ pub struct Swap<'info> {
     pub nft_treasury_token_account: Box<Account<'info, TokenAccount>>,
 
 
-    #[account(
-        mut,
-        associated_token::mint = nft_mint,
-        associated_token::authority = user
-    )]
-    pub nft_token_account: Box<Account<'info, TokenAccount>>,
+
+    /// CHECK: Manual validation
+    #[account(mut)]
+    pub sol_treasury: AccountInfo<'info>,
 
 
+    // #[account(
+    //     mut,
+    //     associated_token::mint = nft_mint,
+    //     associated_token::authority = user
+    // )]
+    // pub nft_token_account: Box<Account<'info, TokenAccount>>,
 
 
     #[account(
         init,
         payer = user,
         associated_token::mint = nft_mint,
-        associated_token::authority = user_swap
+        associated_token::authority = user_receiver
 
     )]
     pub nft_token_swap_account: Box<Account<'info, TokenAccount>>,
