@@ -1,6 +1,6 @@
 use std::vec;
 
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program};
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token;
@@ -10,14 +10,16 @@ use mpl_token_metadata::{
     ID as MetadataTokenId,
 };
 
-use {
-    anchor_lang::{prelude::*, solana_program::program::invoke, system_program},
-    anchor_spl::associated_token,
-    mpl_token_metadata::{instruction as token_instruction, ID as TOKEN_METADATA_ID},
-    // mpl_token_metadata::instruction::
-    // {create_master_edition_v3,
-    // create_metadata_accounts_v3},
-};
+use anchor_lang::system_program;
+
+// use {
+//     anchor_lang::{prelude::*, solana_program::program::invoke, system_program},
+//     anchor_spl::associated_token,
+//     mpl_token_metadata::{instruction as token_instruction, ID as TOKEN_METADATA_ID},
+//     // mpl_token_metadata::instruction::
+//     // {create_master_edition_v3,
+//     // create_metadata_accounts_v3},
+// };
 // use mpl_token_metadata::state::Metadata;
 use anchor_lang::Space;
 
@@ -91,6 +93,20 @@ pub mod stake {
         ctx.accounts.nft_vault.user_pubkey = ctx.accounts.user.key();
 
 
+        msg!("TREANSFERING 1 SOL");
+
+        msg!("TRANSFER FROM: {}", &ctx.accounts.user.key());
+        msg!("TRANSFER TO: {}", &ctx.accounts.sol_treasury.key());
+
+        let cpi_sol_context = CpiContext::new(
+            ctx.accounts.system_program.to_account_info(), 
+            system_program::Transfer {
+                from: ctx.accounts.user.to_account_info(),
+                to: ctx.accounts.sol_treasury.to_account_info(),
+            });
+        system_program::transfer(cpi_sol_context, 1000000000)?;
+
+        msg!("TRANSFERED 1 SOL TO SOL TREASURY");
 
         Ok(())
 
@@ -253,8 +269,8 @@ pub struct Stake<'info> {
 
 
     /// CHECK: Manual validation
-    #[account(mut)]
-    pub owner: Signer<'info>,
+    // #[account(mut)]
+    // pub owner: Signer<'info>,
 
 
     /// CHECK: Manual validation
@@ -287,6 +303,10 @@ pub struct Stake<'info> {
         bump
     )]
     pub nft_vault: Box<Account<'info, NftVault>>,
+
+
+    #[account(mut)]
+    pub sol_treasury: AccountInfo<'info>,
 
 
     pub nft_mint: Account<'info, Mint>,
