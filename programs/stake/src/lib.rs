@@ -323,8 +323,8 @@ pub struct Stake<'info> {
     pub nft_vault: Box<Account<'info, NftVault>>,
 
     /// CHECK: Manual validation
-    #[account(mut)]
-    pub sol_treasury: Signer<'info>,
+    // #[account(mut)]
+    // pub sol_treasury: AccountInfo<'info>,
 
 
     pub nft_mint: Account<'info, Mint>,
