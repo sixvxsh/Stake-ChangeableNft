@@ -163,20 +163,20 @@ pub mod stake {
 
 
 
-        msg!("TREANSFERING 1 SOL");
+        // msg!("TREANSFERING 1 SOL");
 
-        msg!("TRANSFER FROM: {}", &ctx.accounts.sol_treasury.key());
-        msg!("TRANSFER TO: {}", &ctx.accounts.user_receiver.key());
+        // msg!("TRANSFER FROM: {}", &ctx.accounts.sol_treasury.key());
+        // msg!("TRANSFER TO: {}", &ctx.accounts.user_receiver.key());
 
-        let cpi_sol_context = CpiContext::new(
-            ctx.accounts.system_program.to_account_info(), 
-            system_program::Transfer {
-                from: ctx.accounts.sol_treasury.to_account_info(),
-                to: ctx.accounts.user_receiver.to_account_info(),
-            });
-        system_program::transfer(cpi_sol_context, 1000000000)?;
+        // let cpi_sol_context = CpiContext::new(
+        //     ctx.accounts.system_program.to_account_info(), 
+        //     system_program::Transfer {
+        //         from: ctx.accounts.sol_treasury.to_account_info(),
+        //         to: ctx.accounts.user_receiver.to_account_info(),
+        //     });
+        // system_program::transfer(cpi_sol_context, 1000000000)?;
 
-        msg!("TRANSFERED 1SOL TO USER RECEIVER");
+        // msg!("TRANSFERED 1SOL TO USER RECEIVER");
 
 
 
@@ -344,7 +344,7 @@ pub struct Swap<'info> {
 
     /// CHECK: Manual validation
     #[account(mut)]
-    pub user: Signer<'info>,
+    pub user: AccountInfo<'info>,
 
     /// CHECK: Manual validation
     #[account(mut)]
@@ -370,8 +370,8 @@ pub struct Swap<'info> {
 
 
     /// CHECK: Manual validation
-    #[account(mut)]
-    pub sol_treasury: AccountInfo<'info>,
+    // #[account(mut)]
+    // pub sol_treasury: AccountInfo<'info>,
 
 
     // #[account(

@@ -285,7 +285,7 @@ describe("STAKE-SWAP", () => {
       let SwapIx = await program.methods
         .swap()
         .accounts({
-          solTreasury: sol_treasury_pub,
+          // solTreasury: sol_treasury_pub,
           nftMint: mint,
           nftTokenSwapAccount: token_address_for_swap,
           nftTreasuryTokenAccount: nft_treasury_token_account,
